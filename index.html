@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWPL 08 Peace Education Training - Administration</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Inter & Outfit) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: {
+                            50: '#f2f9f9',
+                            100: '#d7efee',
+                            200: '#b4e1df',
+                            300: '#83cbc8',
+                            400: '#4daea9',
+                            500: '#33928e',
+                            600: '#277572',
+                            700: '#225d5b',
+                            800: '#1f4c4a',
+                            900: '#1d403f',
+                        },
+                        tape: '#f5e5a3'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for Admin Analytics Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .doodle-bg {
+            background-color: #f7faf9;
+            background-image: radial-gradient(#277572 0.75px, transparent 0.75px), radial-gradient(#277572 0.75px, #f7faf9 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        .tape-badge {
+            background-color: #f6ea9d;
+            box-shadow: 2px 3px 0px rgba(0,0,0,0.1);
+            transform: rotate(-3deg);
+        }
+
+        .poster-card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(39, 117, 114, 0.15), 0 8px 10px -6px rgba(39, 117, 114, 0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b4e1df;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #33928e;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 doodle-bg font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-5 transform transition-all">
+            <div>
+                <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Restricted Access</span>
+                <h2 class="text-xl font-display font-extrabold text-teal-950 mt-2">HWPL 08 Peace Education Training</h2>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Please enter the program access code to access the portal.</p>
+            </div>
+            <form onsubmit="verifySitePasscode(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="sitePasscodeInput" required placeholder="Access Code" class="w-full text-center px-4 py-3 border border-slate-300 rounded-xl text-base font-bold tracking-widest focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="w-2/3 bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-key"></i> Enter Portal
+                    </button>
+                    <button type="button" onclick="bypassSiteGate()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all border border-slate-200">
+                        Quick Bypass
+                    </button>
+                </div>
+            </form>
+            <p class="text-[11px] text-slate-400">Authorized participants only</p>
+        </div>
+    </div>
+
+    <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-display font-bold text-slate-900">Admin Authentication</h3>
+                <p class="text-xs text-slate-500 mt-1">Enter administrator password to access records.</p>
+            </div>
+            <form onsubmit="verifyAdminPassword(event)" class="space-y-3">
+                <input type="password" id="adminPasswordInput" required placeholder="Admin Password" class="w-full text-center px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-sm">Unlock Admin</button>
+                </div>
+            </form>
+            <p class="text-[11px] text-slate-400">Authorized personnel only</p>
+        </div>
+    </div>
+
+    <div id="appsScriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-3xl w-full shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-display font-bold text-slate-900"><i class="fa-solid fa-code text-teal-600 mr-2"></i> Google Apps Script Integration & Two-Way Sync Guide</h3>
+                <button onclick="closeAppsScriptGuide()" class="text-slate-400 hover:text-slate-700 font-bold text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                To allow the web app to load and accumulate data directly from Google Sheets (Two-way sync), update your Google Apps Script (`Code.gs`) with both <strong>doPost</strong> and <strong>doGet</strong> functions:
+            </p>
+            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-[11px] font-mono overflow-x-auto space-y-2">
+                <pre><code>// Google Apps Script (Code.gs)
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([data.timestamp, data.type, data.name, data.country, data.school, data.position || '', data.session || data.week || '', data.content || '', data.reflection || '']);
+  return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+  var result = [];
+  for (var i = 1; i &lt; rows.length; i++) {
+    var row = rows[i];
+    if (row[0]) {
+      result.push({
+        timestamp: row[0],
+        type: row[1],
+        name: row[2],
+        country: row[3],
+        school: row[4],
+        position: row[5],
+        session: row[6],
+        week: row[6],
+        content: row[7],
+        reflection: row[8]
+      });
+    }
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}</code></pre>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeAppsScriptGuide()" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl">Close Guide</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white/90 backdrop-blur-md border-b border-teal-100 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-teal-100 text-teal-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">HWPL 08</span>
+                        <h1 class="font-display font-extrabold text-teal-900 text-base md:text-lg leading-none">HWPL 08 PEACE EDUCATION TRAINING</h1>
+                    </div>
+                    <p class="text-xs text-teal-600 font-medium mt-0.5">HWPL 08 Peace Education Training Portal</p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="flex items-center bg-teal-50 p-1 rounded-xl border border-teal-200">
+                <button id="btnStudentMode" onclick="switchMode('student')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm bg-white text-teal-800">
+                    <i class="fa-solid fa-user-graduate mr-1 text-teal-600"></i> Portal
+                </button>
+                <button id="btnAdminMode" onclick="switchMode('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-teal-800 transition-all">
+                    <i class="fa-solid fa-user-shield mr-1"></i> Admin Dashboard
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- ==================== STUDENT VIEW ==================== -->
+        <div id="studentView" class="space-y-8">
+            
+            <!-- Hero Banner -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-teal-100 poster-card-shadow relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-teal-100 opacity-60 pointer-events-none">
+                    <i class="fa-solid fa-paper-plane text-[160px] transform -rotate-12"></i>
+                </div>
+                <div class="absolute right-1/3 top-2 text-teal-100 opacity-40 pointer-events-none">
+                    <i class="fa-solid fa-lightbulb text-7xl"></i>
+                </div>
+
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 space-y-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="tape-badge font-display font-extrabold text-xs text-amber-900 px-3 py-1 rounded-sm uppercase tracking-wider">
+                                Peace Education
+                            </span>
+                            <span class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-star text-amber-400"></i> 2026 2nd HWPL PEACE EDUCATION
+                            </span>
+                        </div>
+
+                        <h2 class="text-2xl md:text-4xl font-display font-black text-teal-900 tracking-tight leading-tight">
+                            2026 2nd HWPL PEACE EDUCATION<br class="hidden sm:inline"/> TRAINING
+                        </h2>
+
+                        <p class="text-teal-700 text-xs md:text-sm leading-relaxed max-w-2xl font-medium">
+                            Join HWPL's Peace Education Training! HWPL Peace Education Training educates teachers on HWPL peace textbook 12 lessons so that students can learn the value of peace through peace educators.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-teal-600 text-white p-5 rounded-2xl shadow-lg border-2 border-teal-500 flex flex-col justify-center items-center text-center space-y-2 relative transform hover:scale-[1.02] transition-transform">
+                        <div class="absolute -top-3 bg-tape text-teal-950 font-black text-[11px] px-3 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                            SCHEDULE & TIME
+                        </div>
+                        <div class="text-xl font-display font-black text-emerald-300 tracking-wide mt-1">
+                            AUG 8 – SEPT 5
+                        </div>
+                        <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-400/60 pb-2 w-full">
+                            EVERY SATURDAY
+                        </div>
+                        <div class="pt-1 text-xs space-y-0.5 font-semibold text-teal-50">
+                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30</p>
+                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 14:30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-teal-200 shadow-md space-y-5">
+                <div class="flex items-center gap-3 border-b border-teal-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-clipboard-user"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 1</span>
+                            <h3 class="text-xl font-display font-black text-teal-950">1. Attendance Check</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Please check in your attendance for each live session.</p>
+                    </div>
+                </div>
+
+                <form id="attendanceForm" onsubmit="handleAttendanceSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">1. Full Name <span class="text-rose-500">*</span></label>
+                        <input type="text" id="attName" required placeholder="e.g. Maria Santos" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">2. Country <span class="text-rose-500">*</span></label>
+                        <select id="attCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">3. School / Organization <span class="text-rose-500">*</span></label>
+                        <input type="text" id="attSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">4. Position <span class="text-rose-500">*</span></label>
+                        <select id="attPosition" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Position...</option>
+                            <option value="Ministry Official">Ministry Official</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Vice Principal">Vice Principal</option>
+                            <option value="Teacher / Educator">Teacher / Educator</option>
+                            <option value="School Administrator">School Administrator</option>
+                            <option value="Student">Student</option>
+                            <option value="Community Leader">Community Leader</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">5. Year <span class="text-rose-500">*</span></label>
+                        <select id="attYear" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="2026" selected>2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">6. Session <span class="text-rose-500">*</span></label>
+                        <select id="attSession" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Session...</option>
+                            <option value="Aug 8 (Sat) - Session 1">Aug 8 (Sat) - Session 1 (OT - Active)</option>
+                            <option value="Aug 15 (Sat) - Session 2" disabled>Aug 15 (Sat) - Session 2 (Coming Soon)</option>
+                            <option value="Aug 22 (Sat) - Session 3" disabled>Aug 22 (Sat) - Session 3 (Coming Soon)</option>
+                            <option value="Aug 29 (Sat) - Session 4" disabled>Aug 29 (Sat) - Session 4 (Coming Soon)</option>
+                            <option value="Sept 5 (Sat) - Session 5" disabled>Sept 5 (Sat) - Session 5 (Coming Soon)</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3 pt-2">
+                        <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-check-double text-emerald-300"></i> Submit Attendance
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-indigo-200 shadow-md space-y-6">
+                <div class="flex items-center gap-3 border-b border-indigo-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-video"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-indigo-100 text-indigo-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 2</span>
+                            <h3 class="text-xl font-display font-black text-indigo-950">2. Recorded Video List & Catch-up Attendance</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Missed a live session? Click the links below to watch session recordings directly, then submit your reflection to automatically update your attendance.</p>
+                    </div>
+                </div>
+
+                <!-- Video Cards Grid with Direct Clickable Links -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 1</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 8</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm">Orientation & Core Values</h4>
+                            <p class="text-[11px] text-slate-300">HWPL Peace Education 12 Lessons Overview</p>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=ajTnVzwP71k" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
+                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
+                        </a>
+                    </div>
+
+                    <div class="bg-slate-800 text-slate-400 p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-slate-700 opacity-75">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-slate-700 text-slate-300 text-[10px] font-extrabold px-2 py-0.5 rounded">Session 2</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 15</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm text-slate-300">Lessons 1 ~ 2</h4>
+                            <p class="text-[11px] text-slate-500">Fostering Empathy & Peace Consciousness</p>
+                        </div>
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-800 text-slate-400 p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-slate-700 opacity-75">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-slate-700 text-slate-300 text-[10px] font-extrabold px-2 py-0.5 rounded">Session 3</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 22</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm text-slate-300">Lessons 3 ~ 4</h4>
+                            <p class="text-[11px] text-slate-500">Conflict Resolution & Dialogue Methods</p>
+                        </div>
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-800 text-slate-400 p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-slate-700 opacity-75">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-slate-700 text-slate-300 text-[10px] font-extrabold px-2 py-0.5 rounded">Session 4</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 29</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm text-slate-300">Lessons 5 ~ 8</h4>
+                            <p class="text-[11px] text-slate-500">Peace Culture in School Curriculum</p>
+                        </div>
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-800 text-slate-400 p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-slate-700 opacity-75 md:col-span-2 lg:col-span-1">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-slate-700 text-slate-300 text-[10px] font-extrabold px-2 py-0.5 rounded">Session 5</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-solid fa-calendar-days mr-1"></i>Sept 5</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm text-slate-300">Lessons 9 ~ 12 & Wrap-up</h4>
+                            <p class="text-[11px] text-slate-500">Final Lesson Plan & Certification</p>
+                        </div>
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-5 md:p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-display font-extrabold text-indigo-950 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-pen-nib text-indigo-600"></i> Video Reflection & Attendance Catch-up Form
+                        </h4>
+                        <span class="text-xs bg-indigo-200 text-indigo-900 font-bold px-3 py-1 rounded-full">Updates Attendance Automatically</span>
+                    </div>
+
+                    <form id="videoAttendanceForm" onsubmit="handleVideoAttendanceSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">1. Full Name <span class="text-rose-500">*</span></label>
+                            <input type="text" id="vidAttName" required placeholder="e.g. Maria Santos" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">2. Country <span class="text-rose-500">*</span></label>
+                            <select id="vidAttCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="" disabled selected>Select Country...</option>
+                                <option value="Aruba">Aruba</option>
+                                <option value="Belgium">Belgium</option>
+                                <option value="Bonaire">Bonaire</option>
+                                <option value="China">China</option>
+                                <option value="Curaçao">Curaçao</option>
+                                <option value="France">France</option>
+                                <option value="Germany">Germany</option>
+                                <option value="India">India</option>
+                                <option value="Malawi">Malawi</option>
+                                <option value="Netherlands">Netherlands</option>
+                                <option value="Sint Maarten">Sint Maarten</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="South Korea">South Korea</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Zambia">Zambia</option>
+                                <option value="Zimbabwe">Zimbabwe</option>
+                                <option value="Other">Other Country</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">3. School / Organization <span class="text-rose-500">*</span></label>
+                            <input type="text" id="vidAttSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">4. Position <span class="text-rose-500">*</span></label>
+                            <select id="vidAttPosition" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="" disabled selected>Select Position...</option>
+                                <option value="Ministry Official">Ministry Official</option>
+                                <option value="Principal">Principal</option>
+                                <option value="Vice Principal">Vice Principal</option>
+                                <option value="Teacher / Educator">Teacher / Educator</option>
+                                <option value="School Administrator">School Administrator</option>
+                                <option value="Student">Student</option>
+                                <option value="Community Leader">Community Leader</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">5. Year <span class="text-rose-500">*</span></label>
+                            <select id="vidAttYear" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="2026" selected>2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">6. Target Session <span class="text-rose-500">*</span></label>
+                            <select id="vidAttSession" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                <option value="" disabled selected>Select Session...</option>
+                                <option value="Aug 8 (Sat) - Session 1">Aug 8 (Sat) - Session 1 (OT - Active)</option>
+                                <option value="Aug 15 (Sat) - Session 2" disabled>Aug 15 (Sat) - Session 2 (Coming Soon)</option>
+                                <option value="Aug 22 (Sat) - Session 3" disabled>Aug 22 (Sat) - Session 3 (Coming Soon)</option>
+                                <option value="Aug 29 (Sat) - Session 4" disabled>Aug 29 (Sat) - Session 4 (Coming Soon)</option>
+                                <option value="Sept 5 (Sat) - Session 5" disabled>Sept 5 (Sat) - Session 5 (Coming Soon)</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">7. Reflection <span class="text-rose-500">*</span></label>
+                            <textarea id="vidAttContent" required rows="3" placeholder="Write your reflection and learnings after watching the recorded video..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"></textarea>
+                        </div>
+
+                        <div class="md:col-span-2 lg:col-span-3 pt-1">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                                <i class="fa-solid fa-video text-emerald-300"></i> Submit Video Reflection & Update Attendance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-md space-y-6">
+                <div class="flex items-center gap-3 border-b border-amber-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-video"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 3</span>
+                            <h3 class="text-xl font-display font-black text-amber-950">3. Mission Submissions & Weekly Assignments</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Submit your weekly reflections and training assignments.</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 md:p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-display font-extrabold text-amber-950 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-file-pen text-amber-600"></i> Mission & Assignment Submission
+                        </h4>
+                        <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Weekly Reflections</span>
+                    </div>
+
+                    <div class="bg-white border border-amber-300 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-900 shadow-sm">
+                        <i class="fa-solid fa-circle-info text-amber-600 text-sm mt-0.5"></i>
+                        <div>
+                            <span class="font-bold">Notice regarding photo attachments:</span>
+                            <p class="text-amber-800 mt-0.5">Please submit any photo/image attachments directly to your designated <strong>Group Chat</strong>.</p>
+                        </div>
+                    </div>
+
+                    <form id="missionForm" onsubmit="handleMissionSubmit(event)" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
+                                <input type="text" id="missionName" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
+                                <select id="missionCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                                    <option value="" disabled selected>Select Country...</option>
+                                    <option value="Aruba">Aruba</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Bonaire">Bonaire</option>
+                                    <option value="China">China</option>
+                                    <option value="Curaçao">Curaçao</option>
+                                    <option value="France">France</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="India">India</option>
+                                    <option value="Malawi">Malawi</option>
+                                    <option value="Netherlands">Netherlands</option>
+                                    <option value="Sint Maarten">Sint Maarten</option>
+                                    <option value="South Africa">South Africa</option>
+                                    <option value="South Korea">South Korea</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="Zambia">Zambia</option>
+                                    <option value="Zimbabwe">Zimbabwe</option>
+                                    <option value="Other">Other Country</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">School / Organization <span class="text-rose-500">*</span></label>
+                                <input type="text" id="missionSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Year <span class="text-rose-500">*</span></label>
+                                <select id="missionYear" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                                    <option value="2026" selected>2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Mission Week / Session <span class="text-rose-500">*</span></label>
+                                <select id="missionWeek" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                                    <option value="" disabled selected>Select Mission...</option>
+                                    <option value="Session 1 Mission">Session 1 Mission: Understanding Peace Education Core Values</option>
+                                    <option value="Session 2 Mission">Session 2 Mission: Fostering Empathy in the Classroom</option>
+                                    <option value="Session 3 Mission">Session 3 Mission: Conflict Resolution & Dialogue</option>
+                                    <option value="Session 4 Mission">Session 4 Mission: Final Lesson Plan Presentation</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Mission Reflection / Content <span class="text-rose-500">*</span></label>
+                            <textarea id="missionContent" required rows="3" placeholder="Share your insights, lesson plan summaries, or reflections..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Submit Weekly Mission
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- My Record Lookup -->
+                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                    <h3 class="font-display font-extrabold text-teal-950 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass text-teal-600"></i> My Record Lookup
+                    </h3>
+                    <p class="text-xs text-slate-500">Check your submitted attendance and missions instantly.</p>
+                    <form onsubmit="handleMyRecordLookup(event)" class="space-y-3">
+                        <input type="text" id="lookupName" required placeholder="Your Full Name" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <select id="lookupCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                        <input type="text" id="lookupSchool" required placeholder="School / Organization" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold py-2.5 rounded-xl">Lookup Records</button>
+                    </form>
+                    <div id="lookupResultContainer" class="hidden pt-3 border-t border-slate-100 space-y-2 text-xs">
+                        <div class="flex justify-between font-bold text-teal-950">
+                            <span id="lookupResultName">Name</span>
+                            <span>Attended: <strong id="lookupAttCount">0</strong> | Missions: <strong id="lookupMisCount">0</strong></span>
+                        </div>
+                        <div id="lookupAttList" class="space-y-1 max-h-32 overflow-y-auto"></div>
+                        <div id="lookupMisList" class="space-y-1 max-h-32 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <!-- Q&A Board -->
+                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                    <h3 class="font-display font-extrabold text-teal-950 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-indigo-600"></i> Q&A & Support
+                    </h3>
+                    <p class="text-xs text-slate-500">Ask questions regarding training materials.</p>
+                    <form id="qnaForm" onsubmit="handleQnaSubmit(event)" class="space-y-3">
+                        <input type="text" id="qnaName" required placeholder="Your Name" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <select id="qnaCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                        <textarea id="qnaContent" required rows="2" placeholder="Your question..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl">Post Question</button>
+                    </form>
+                    <div id="qnaList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                </div>
+
+                <!-- Peace Messages Board -->
+                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                    <h3 class="font-display font-extrabold text-teal-950 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-heart text-rose-500"></i> Global Peace Messages
+                    </h3>
+                    <p class="text-xs text-slate-500">Leave warm encouragement for fellow educators.</p>
+                    <form id="peaceMsgForm" onsubmit="handlePeaceMsgSubmit(event)" class="space-y-3">
+                        <input type="text" id="peaceName" required placeholder="Your Name" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <select id="peaceCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                        <textarea id="peaceContent" required rows="2" placeholder="Peace message..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2.5 rounded-xl">Send Message</button>
+                    </form>
+                    <div id="peaceMsgList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADMIN VIEW ==================== -->
+        <div id="adminView" class="hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-3xl border border-teal-100 shadow-sm">
+                <div>
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2.5 py-1 rounded-md uppercase">Management Control Center</span>
+                    <h2 class="text-xl font-display font-extrabold text-teal-950 mt-1">HWPL 08 Admin Analytics Dashboard</h2>
+                    <p class="text-xs text-slate-500">Review total attendance, mission submissions, and export CSV reports.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="refreshAdminData()" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-rotate"></i> Sync & Refresh Data
+                    </button>
+                    <button onclick="openAppsScriptGuide()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-code"></i> Integration Guide
+                    </button>
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-teal-100 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Total Attendance</p>
+                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalAttendance">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Total Missions</p>
+                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalMissions">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Countries Reached</p>
+                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalCountries">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Organizations</p>
+                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalSchools">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                    <h4 class="font-display font-extrabold text-teal-950 text-base">Attendance by Session</h4>
+                    <div class="h-64 relative">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                    <h4 class="font-display font-extrabold text-teal-950 text-base">Submissions by Country</h4>
+                    <div class="h-64 relative">
+                        <canvas id="countryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl border border-teal-100 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <button id="tabAttendanceBtn" onclick="switchAdminTab('attendance')" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all">Attendance Records</button>
+                        <button id="tabMissionsBtn" onclick="switchAdminTab('missions')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Mission Submissions</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <div class="w-full sm:w-40">
+                            <select id="adminYearFilter" onchange="filterAdminTable()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                <option value="">All Years</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-64">
+                            <input type="text" id="adminSearchInput" oninput="filterAdminTable()" placeholder="Search records..." class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="adminTable">
+                        <thead class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
+                            <tr id="adminTableHeader">
+                                <th class="p-4">Name</th>
+                                <th class="p-4">Country</th>
+                                <th class="p-4">School / Org</th>
+                                <th class="p-4">Position</th>
+                                <th class="p-4">Session</th>
+                                <th class="p-4">Timestamp</th>
+                                <th class="p-4 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400">Loading records...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script> 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynymQgGAZ-LMwcIUXgosBonlPkAasmqv6sPWDp-Qg0sxND_wig7qL4BuBiM4xCYcny5w/exec';
+
+        let appData = {
+            attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() },
+                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() },
+                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() }
+            ])),
+            missions: JSON.parse(localStorage.getItem('hwpl_missions') || JSON.stringify([
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', year: '2026', week: 'Session 1 Mission', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', timestamp: new Date().toLocaleString() }
+            ])),
+            qna: JSON.parse(localStorage.getItem('hwpl_qna') || JSON.stringify([
+                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString() }
+            ])),
+            peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || JSON.stringify([
+                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: new Date().toLocaleString() }
+            ]))
+        };
+
+        let currentAdminTab = 'attendance';
+        let attendanceChartInstance = null;
+        let countryChartInstance = null;
+
+        function saveToLocalStorage() {
+            localStorage.setItem('hwpl_attendance', JSON.stringify(appData.attendance));
+            localStorage.setItem('hwpl_missions', JSON.stringify(appData.missions));
+            localStorage.setItem('hwpl_qna', JSON.stringify(appData.qna));
+            localStorage.setItem('hwpl_peaceMsg', JSON.stringify(appData.peaceMsg));
+        }
+
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    const fetchedAttendance = [];
+                    const fetchedMissions = [];
+                    const fetchedQna = [];
+                    const fetchedPeaceMsg = [];
+                    data.forEach(item => {
+                        if (item.type === 'attendance') {
+                            fetchedAttendance.push(item);
+                        } else if (item.type === 'mission') {
+                            fetchedMissions.push(item);
+                        } else if (item.type === 'qna') {
+                            fetchedQna.push(item);
+                        } else if (item.type === 'peaceMsg') {
+                            fetchedPeaceMsg.push(item);
+                        }
+                    });
+                    if (fetchedAttendance.length > 0) appData.attendance = fetchedAttendance;
+                    if (fetchedMissions.length > 0) appData.missions = fetchedMissions;
+                    if (fetchedQna.length > 0) appData.qna = fetchedQna;
+                    if (fetchedPeaceMsg.length > 0) appData.peaceMsg = fetchedPeaceMsg;
+                    saveToLocalStorage();
+                    renderQnaList();
+                    renderPeaceMsgList();
+                    
+                    const adminView = document.getElementById('adminView');
+                    if (adminView && !adminView.classList.contains('hidden')) {
+                        renderAdminDashboard();
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch from Google Sheets (using local data):', error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 rounded-xl text-xs font-bold text-white shadow-lg pointer-events-auto transition-all transform translate-y-2 opacity-0 flex items-center gap-2 ${type === 'success' ? 'bg-teal-700' : 'bg-rose-600'}`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function verifySitePasscode(e) {
+            e.preventDefault();
+            const code = document.getElementById('sitePasscodeInput').value;
+            if (code === '2026') {
+                document.getElementById('siteGateModal').classList.add('hidden');
+                showToast('Welcome to HWPL 08 Portal!', 'success');
+            } else {
+                showToast('Incorrect access code. Please try again.', 'error');
+            }
+        }
+
+        function bypassSiteGate() {
+            document.getElementById('siteGateModal').classList.add('hidden');
+            showToast('Portal accessed via quick bypass.', 'success');
+        }
+
+        async function switchMode(mode) {
+            const studentView = document.getElementById('studentView');
+            const adminView = document.getElementById('adminView');
+            const btnStudent = document.getElementById('btnStudentMode');
+            const btnAdmin = document.getElementById('btnAdminMode');
+
+            if (mode === 'admin') {
+                document.getElementById('adminAuthModal').classList.remove('hidden');
+            } else {
+                studentView.classList.remove('hidden');
+                adminView.classList.add('hidden');
+                btnStudent.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm bg-white text-teal-800";
+                btnAdmin.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-teal-800 transition-all";
+            }
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        async function verifyAdminPassword(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (pwd === 'admin1234') {
+                document.getElementById('adminAuthModal').classList.add('hidden');
+                document.getElementById('studentView').classList.add('hidden');
+                document.getElementById('adminView').classList.remove('hidden');
+                document.getElementById('btnStudentMode').className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-teal-800 transition-all";
+                document.getElementById('btnAdminMode').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm bg-white text-teal-800";
+                
+                await fetchGoogleSheetData();
+                renderAdminDashboard();
+                showToast('Logged in as Admin successfully!', 'success');
+                document.getElementById('adminPasswordInput').value = '';
+            } else {
+                showToast('Incorrect admin password.', 'error');
+            }
+        }
+
+        function openAppsScriptGuide() {
+            document.getElementById('appsScriptModal').classList.remove('hidden');
+        }
+
+        function closeAppsScriptGuide() {
+            document.getElementById('appsScriptModal').classList.add('hidden');
+        }
+
+        async function sendToNetlifyForms(formData) {
+            const body = new URLSearchParams();
+            body.append('form-name', formData.type);
+            for (const key in formData) {
+                body.append(key, formData[key]);
+            }
+            try {
+                await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: body.toString()
+                });
+            } catch (error) {
+                console.error('Netlify Forms error:', error);
+            }
+        }
+
+        async function sendDataToGoogleSheet(payload) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                return true;
+            } catch (error) {
+                console.error('Google Sheets Sync Error:', error);
+                return false;
+            }
+        }
+
+        async function handleAttendanceSubmit(event) {
+            event.preventDefault();
+            const formData = {
+                type: 'attendance',
+                name: document.getElementById('attName').value.trim(),
+                country: document.getElementById('attCountry').value,
+                school: document.getElementById('attSchool').value.trim(),
+                position: document.getElementById('attPosition').value,
+                year: document.getElementById('attYear').value,
+                session: document.getElementById('attSession').value,
+                timestamp: new Date().toLocaleString()
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting attendance...';
+
+            try {
+                appData.attendance.unshift(formData);
+                saveToLocalStorage();
+                await Promise.all([
+                    sendToNetlifyForms(formData),
+                    sendDataToGoogleSheet(formData)
+                ]);
+                await fetchGoogleSheetData();
+                showToast('Attendance submitted & synced successfully!', 'success');
+                document.getElementById('attendanceForm').reset();
+            } catch (error) {
+                showToast('Attendance recorded locally!', 'success');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        async function handleVideoAttendanceSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('vidAttName').value.trim();
+            const country = document.getElementById('vidAttCountry').value;
+            const school = document.getElementById('vidAttSchool').value.trim();
+            const position = document.getElementById('vidAttPosition').value;
+            const year = document.getElementById('vidAttYear').value;
+            const session = document.getElementById('vidAttSession').value;
+            const content = document.getElementById('vidAttContent').value.trim();
+            const timestamp = new Date().toLocaleString();
+
+            const attendancePayload = {
+                type: 'attendance',
+                name: name,
+                country: country,
+                school: school,
+                position: position,
+                year: year,
+                session: session + ' (Video Catch-up)',
+                timestamp: timestamp,
+                reflection: content
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating Attendance...';
+
+            try {
+                appData.attendance.unshift(attendancePayload);
+                saveToLocalStorage();
+
+                await Promise.all([
+                    sendToNetlifyForms(attendancePayload),
+                    sendDataToGoogleSheet(attendancePayload)
+                ]);
+
+                await fetchGoogleSheetData();
+                showToast('Video reflection submitted & attendance synced successfully!', 'success');
+                document.getElementById('videoAttendanceForm').reset();
+            } catch (error) {
+                showToast('Recorded locally & attendance updated!', 'success');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        async function handleMissionSubmit(event) {
+            event.preventDefault();
+            const formData = {
+                type: 'mission',
+                name: document.getElementById('missionName').value.trim(),
+                country: document.getElementById('missionCountry').value,
+                school: document.getElementById('missionSchool').value.trim(),
+                year: document.getElementById('missionYear').value,
+                week: document.getElementById('missionWeek').value,
+                content: document.getElementById('missionContent').value.trim(),
+                timestamp: new Date().toLocaleString()
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting mission...';
+
+            try {
+                appData.missions.unshift(formData);
+                saveToLocalStorage();
+                await Promise.all([
+                    sendToNetlifyForms(formData),
+                    sendDataToGoogleSheet(formData)
+                ]);
+                await fetchGoogleSheetData();
+                showToast('Mission submitted & synced successfully!', 'success');
+                document.getElementById('missionForm').reset();
+            } catch (error) {
+                showToast('Mission recorded locally!', 'success');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        async function handleQnaSubmit(e) {
+            e.preventDefault();
+            const item = {
+                type: 'qna',
+                name: document.getElementById('qnaName').value.trim(),
+                country: document.getElementById('qnaCountry').value,
+                content: document.getElementById('qnaContent').value.trim(),
+                timestamp: new Date().toLocaleString()
+            };
+            appData.qna.unshift(item);
+            saveToLocalStorage();
+            renderQnaList();
+            await Promise.all([
+                sendToNetlifyForms(item),
+                sendDataToGoogleSheet(item)
+            ]);
+            await fetchGoogleSheetData();
+            showToast('Question posted & synced successfully!', 'success');
+            document.getElementById('qnaForm').reset();
+        }
+
+        function renderQnaList() {
+            const list = document.getElementById('qnaList');
+            if (!list) return;
+            if (appData.qna.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">No questions posted yet.</p>`;
+                return;
+            }
+            list.innerHTML = appData.qna.map(q => `
+                <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 text-xs space-y-1">
+                    <div class="flex justify-between items-center text-slate-500 font-bold">
+                        <span>${q.name} (${q.country})</span>
+                        <span class="text-[10px] text-slate-400">${q.timestamp}</span>
+                    </div>
+                    <p class="text-indigo-950 font-medium">${q.content}</p>
+                </div>
+            `).join('');
+        }
+
+        async function handlePeaceMsgSubmit(e) {
+            e.preventDefault();
+            const item = {
+                type: 'peaceMsg',
+                name: document.getElementById('peaceName').value.trim(),
+                country: document.getElementById('peaceCountry').value,
+                content: document.getElementById('peaceContent').value.trim(),
+                timestamp: new Date().toLocaleString()
+            };
+            appData.peaceMsg.unshift(item);
+            saveToLocalStorage();
+            renderPeaceMsgList();
+            await Promise.all([
+                sendToNetlifyForms(item),
+                sendDataToGoogleSheet(item)
+            ]);
+            await fetchGoogleSheetData();
+            showToast('Peace message posted & synced successfully!', 'success');
+            document.getElementById('peaceMsgForm').reset();
+        }
+
+        function renderPeaceMsgList() {
+            const list = document.getElementById('peaceMsgList');
+            if (!list) return;
+            if (appData.peaceMsg.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-2 col-span-2">No peace messages posted yet.</p>`;
+                return;
+            }
+            list.innerHTML = appData.peaceMsg.map(m => `
+                <div class="bg-emerald-50/50 p-3.5 rounded-2xl border border-emerald-200 text-xs space-y-1.5 shadow-sm">
+                    <div class="flex justify-between items-center text-emerald-900 font-bold">
+                        <span><i class="fa-solid fa-heart text-emerald-600 mr-1"></i> ${m.name} (${m.country})</span>
+                        <span class="text-[10px] text-emerald-700/60">${m.timestamp}</span>
+                    </div>
+                    <p class="text-emerald-950 leading-relaxed">${m.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function handleMyRecordLookup(e) {
+            e.preventDefault();
+            const name = document.getElementById('lookupName').value.trim().toLowerCase();
+            const country = document.getElementById('lookupCountry').value;
+            const school = document.getElementById('lookupSchool').value.trim().toLowerCase();
+
+            const userAtt = appData.attendance.filter(a => a.name.toLowerCase() === name && a.country === country && (a.school || '').toLowerCase().includes(school));
+            const userMis = appData.missions.filter(m => m.name.toLowerCase() === name && m.country === country && (m.school || '').toLowerCase().includes(school));
+
+            document.getElementById('lookupResultName').textContent = document.getElementById('lookupName').value.trim() + ` (${country}, ${document.getElementById('lookupSchool').value.trim()})`;
+            document.getElementById('lookupAttCount').textContent = userAtt.length;
+            document.getElementById('lookupMisCount').textContent = userMis.length;
+
+            const attList = document.getElementById('lookupAttList');
+            attList.innerHTML = userAtt.length ? userAtt.map(a => `
+                <div class="bg-white p-2 rounded-lg border border-teal-200 flex justify-between items-center">
+                    <div><strong>${a.session}</strong><br/><span class="text-[10px] text-slate-400">${a.school || ''} • ${a.timestamp}</span></div>
+                    <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold text-[10px]">Attended</span>
+                </div>
+            `).join('') : `<p class="text-slate-400 italic">No attendance records found.</p>`;
+
+            const misList = document.getElementById('lookupMisList');
+            misList.innerHTML = userMis.length ? userMis.map(m => `
+                <div class="bg-white p-2 rounded-lg border border-amber-200 space-y-1">
+                    <div class="flex justify-between"><strong>${m.week}</strong><span class="text-[10px] text-slate-400">${m.timestamp}</span></div>
+                    <p class="text-slate-600 truncate">${m.content}</p>
+                </div>
+            `).join('') : `<p class="text-slate-400 italic">No mission submissions found.</p>`;
+
+            document.getElementById('lookupResultContainer').classList.remove('hidden');
+            showToast('Records retrieved successfully!', 'success');
+        }
+
+        function renderAdminDashboard() {
+            document.getElementById('statTotalAttendance').textContent = appData.attendance.length;
+            document.getElementById('statTotalMissions').textContent = appData.missions.length;
+
+            const countries = new Set([...appData.attendance.map(a => a.country), ...appData.missions.map(m => m.country)]);
+            document.getElementById('statTotalCountries').textContent = countries.size;
+
+            const schools = new Set([...appData.attendance.map(a => a.school), ...appData.missions.map(m => m.school)]);
+            document.getElementById('statTotalSchools').textContent = schools.size;
+
+            renderAdminTable();
+            renderCharts();
+        }
+
+        function switchAdminTab(tab) {
+            currentAdminTab = tab;
+            const btnAtt = document.getElementById('tabAttendanceBtn');
+            const btnMis = document.getElementById('tabMissionsBtn');
+            const header = document.getElementById('adminTableHeader');
+
+            if (tab === 'attendance') {
+                btnAtt.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
+                btnMis.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
+                header.innerHTML = `
+                    <th class="p-4">Name</th>
+                    <th class="p-4">Country</th>
+                    <th class="p-4">School / Org</th>
+                    <th class="p-4">Position</th>
+                    <th class="p-4">Session</th>
+                    <th class="p-4">Timestamp</th>
+                    <th class="p-4 text-center">Action</th>
+                `;
+            } else {
+                btnMis.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
+                btnAtt.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
+                header.innerHTML = `
+                    <th class="p-4">Name</th>
+                    <th class="p-4">Country</th>
+                    <th class="p-4">School / Org</th>
+                    <th class="p-4">Week / Session</th>
+                    <th class="p-4">Content / Reflection</th>
+                    <th class="p-4">Timestamp</th>
+                    <th class="p-4 text-center">Action</th>
+                `;
+            }
+            renderAdminTable();
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            const search = (document.getElementById('adminSearchInput').value || '').toLowerCase();
+            const yearFilter = document.getElementById('adminYearFilter').value;
+
+            if (currentAdminTab === 'attendance') {
+                const filteredWithIndices = appData.attendance.map((a, idx) => ({ item: a, index: idx })).filter(({ item: a }) => {
+                    const matchesSearch = (a.name || '').toLowerCase().includes(search) || 
+                        (a.country || '').toLowerCase().includes(search) || 
+                        (a.school || '').toLowerCase().includes(search) || 
+                        (a.session || '').toLowerCase().includes(search);
+                    const matchesYear = !yearFilter || a.year === yearFilter;
+                    return matchesSearch && matchesYear;
+                });
+
+                if (filteredWithIndices.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No attendance records found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filteredWithIndices.map(({ item: a, index: idx }) => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-900">${a.name || ''}</td>
+                        <td class="p-4">${a.country || ''}</td>
+                        <td class="p-4">${a.school || ''}</td>
+                        <td class="p-4"><span class="bg-teal-50 text-teal-800 px-2 py-0.5 rounded font-semibold">${a.position || 'N/A'}</span></td>
+                        <td class="p-4 font-semibold text-teal-900">${a.session || ''}</td>
+                        <td class="p-4 text-slate-400 text-[11px]">${a.timestamp || ''}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteRecord('attendance', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                const filteredWithIndices = appData.missions.map((m, idx) => ({ item: m, index: idx })).filter(({ item: m }) => {
+                    const matchesSearch = (m.name || '').toLowerCase().includes(search) || 
+                        (m.country || '').toLowerCase().includes(search) || 
+                        (m.school || '').toLowerCase().includes(search) || 
+                        (m.week || '').toLowerCase().includes(search) ||
+                        (m.content || '').toLowerCase().includes(search);
+                    const matchesYear = !yearFilter || m.year === yearFilter;
+                    return matchesSearch && matchesYear;
+                });
+
+                if (filteredWithIndices.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No mission submissions found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filteredWithIndices.map(({ item: m, index: idx }) => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-900">${m.name || ''}</td>
+                        <td class="p-4">${m.country || ''}</td>
+                        <td class="p-4">${m.school || ''}</td>
+                        <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.week || ''}</span></td>
+                        <td class="p-4 max-w-xs truncate" title="${m.content || ''}">${m.content || ''}</td>
+                        <td class="p-4 text-slate-400 text-[11px]">${m.timestamp || ''}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteRecord('missions', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function deleteRecord(type, index) {
+            if (type === 'attendance') {
+                appData.attendance.splice(index, 1);
+            } else if (type === 'missions') {
+                appData.missions.splice(index, 1);
+            }
+            saveToLocalStorage();
+            renderAdminDashboard();
+            showToast('Record deleted successfully!', 'success');
+        }
+
+        function filterAdminTable() {
+            renderAdminTable();
+        }
+
+        async function refreshAdminData() {
+            await fetchGoogleSheetData();
+            renderAdminDashboard();
+            showToast('Synced & refreshed successfully!', 'success');
+        }
+
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            if (currentAdminTab === 'attendance') {
+                csvContent += "Name,Country,School,Position,Year,Session,Timestamp\n";
+                appData.attendance.forEach(a => {
+                    csvContent += `"${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
+                });
+            } else {
+                csvContent += "Name,Country,School,Year,Week,Content,Timestamp\n";
+                appData.missions.forEach(m => {
+                    csvContent += `"${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.year || ''}","${m.week || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
+                });
+            }
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `HWPL_08_${currentAdminTab}_records.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('CSV Export generated successfully!', 'success');
+        }
+
+        function renderCharts() {
+            const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
+            const sessionCounts = ['Aug 8', 'Aug 15', 'Aug 22', 'Aug 29', 'Sept 5'].map(dateStr => 
+                appData.attendance.filter(a => (a.session || '').includes(dateStr)).length
+            );
+
+            if (attendanceChartInstance) attendanceChartInstance.destroy();
+            attendanceChartInstance = new Chart(ctxAtt, {
+                type: 'bar',
+                data: {
+                    labels: ['Aug 8 - Sess 1', 'Aug 15 - Sess 2', 'Aug 22 - Sess 3', 'Aug 29 - Sess 4', 'Sept 5 - Sess 5'],
+                    datasets: [{
+                        label: 'Attendance Check-ins',
+                        data: sessionCounts,
+                        backgroundColor: '#33928e',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            const ctxCountry = document.getElementById('countryChart').getContext('2d');
+            const countryMap = {};
+            appData.attendance.forEach(a => { if(a.country) countryMap[a.country] = (countryMap[a.country] || 0) + 1; });
+            appData.missions.forEach(m => { if(m.country) countryMap[m.country] = (countryMap[m.country] || 0) + 1; });
+
+            const countries = Object.keys(countryMap);
+            const counts = Object.values(countryMap);
+
+            if (countryChartInstance) countryChartInstance.destroy();
+            countryChartInstance = new Chart(ctxCountry, {
+                type: 'doughnut',
+                data: {
+                    labels: countries.length ? countries : ['No Data'],
+                    datasets: [{
+                        data: counts.length ? counts : [1],
+                        backgroundColor: ['#277572', '#33928e', '#83cbc8', '#f5e5a3', '#f6ea9d', '#e2e8f0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } }
+                }
+            });
+        }
+
+        window.onload = async function() {
+            renderQnaList();
+            renderPeaceMsgList();
+            await fetchGoogleSheetData();
+        };
+    </script>
+</body>
+</html>
