@@ -852,22 +852,22 @@ function doGet(e) {
     </main>
 
     <script> 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynymQgGAZ-LMwcIUXgosBonlPkAasmqv6sPWDp-Qg0sxND_wig7qL4BuBiM4xCYcny5w/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpOnUKN8-YW_FgtPAOiUG___iGiiT0BZ44Zf_9_cHr8dIVjlRNlY0jHvkK9-4xa9k9tA/exec';
 
         let appData = {
             attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() },
-                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() },
-                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString() }
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') },
+                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') },
+                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') }
             ])),
             missions: JSON.parse(localStorage.getItem('hwpl_missions') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', year: '2026', week: 'Session 1 Mission', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', timestamp: new Date().toLocaleString() }
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', year: '2026', week: 'Session 1 Mission', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', timestamp: new Date().toLocaleString('en-US') }
             ])),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || JSON.stringify([
-                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString() }
+                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString('en-US') }
             ])),
             peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || JSON.stringify([
-                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: new Date().toLocaleString() }
+                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: new Date().toLocaleString('en-US') }
             ]))
         };
 
@@ -1058,7 +1058,7 @@ function doGet(e) {
                 position: document.getElementById('attPosition').value,
                 year: document.getElementById('attYear').value,
                 session: document.getElementById('attSession').value,
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString('en-US')
             };
 
             const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -1087,7 +1087,7 @@ function doGet(e) {
             const year = document.getElementById('vidAttYear').value;
             const session = document.getElementById('vidAttSession').value;
             const content = document.getElementById('vidAttContent').value.trim();
-            const timestamp = new Date().toLocaleString();
+            const timestamp = new Date().toLocaleString('en-US');
 
             const attendancePayload = {
                 type: 'attendance',
@@ -1128,7 +1128,7 @@ function doGet(e) {
                 year: document.getElementById('missionYear').value,
                 week: document.getElementById('missionWeek').value,
                 content: document.getElementById('missionContent').value.trim(),
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString('en-US')
             };
 
             const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -1155,7 +1155,7 @@ function doGet(e) {
                 name: document.getElementById('qnaName').value.trim(),
                 country: document.getElementById('qnaCountry').value,
                 content: document.getElementById('qnaContent').value.trim(),
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString('en-US')
             };
             await syncAndRefreshAfterSubmit(item);
             renderQnaList();
@@ -1188,7 +1188,7 @@ function doGet(e) {
                 name: document.getElementById('peaceName').value.trim(),
                 country: document.getElementById('peaceCountry').value,
                 content: document.getElementById('peaceContent').value.trim(),
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString('en-US')
             };
             await syncAndRefreshAfterSubmit(item);
             renderPeaceMsgList();
