@@ -1028,6 +1028,26 @@ function doGet(e) {
             }
         }
 
+        // Automatic re-fetching and synchronization after submission
+        async function syncAndRefreshAfterSubmit(payload) {
+            appData[payload.type === 'attendance' ? 'attendance' : payload.type === 'mission' ? 'missions' : payload.type === 'qna' ? 'qna' : 'peaceMsg'].unshift(payload);
+            saveToLocalStorage();
+
+            await Promise.all([
+                sendToNetlifyForms(payload),
+                sendDataToGoogleSheet(payload)
+            ]);
+
+            // Allow Google Sheets time to append row, then automatically fetch latest dataset and update admin view
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await fetchGoogleSheetData();
+            
+            const adminView = document.getElementById('adminView');
+            if (adminView && !adminView.classList.contains('hidden')) {
+                renderAdminDashboard();
+            }
+        }
+
         async function handleAttendanceSubmit(event) {
             event.preventDefault();
             const formData = {
@@ -1044,17 +1064,11 @@ function doGet(e) {
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting attendance...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting & Syncing...';
 
             try {
-                appData.attendance.unshift(formData);
-                saveToLocalStorage();
-                await Promise.all([
-                    sendToNetlifyForms(formData),
-                    sendDataToGoogleSheet(formData)
-                ]);
-                await fetchGoogleSheetData();
-                showToast('Attendance submitted & synced successfully!', 'success');
+                await syncAndRefreshAfterSubmit(formData);
+                showToast('Attendance submitted & Google Sheets synchronized!', 'success');
                 document.getElementById('attendanceForm').reset();
             } catch (error) {
                 showToast('Attendance recorded locally!', 'success');
@@ -1090,19 +1104,11 @@ function doGet(e) {
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating Attendance...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating & Syncing...';
 
             try {
-                appData.attendance.unshift(attendancePayload);
-                saveToLocalStorage();
-
-                await Promise.all([
-                    sendToNetlifyForms(attendancePayload),
-                    sendDataToGoogleSheet(attendancePayload)
-                ]);
-
-                await fetchGoogleSheetData();
-                showToast('Video reflection submitted & attendance synced successfully!', 'success');
+                await syncAndRefreshAfterSubmit(attendancePayload);
+                showToast('Video reflection submitted & attendance synchronized!', 'success');
                 document.getElementById('videoAttendanceForm').reset();
             } catch (error) {
                 showToast('Recorded locally & attendance updated!', 'success');
@@ -1128,17 +1134,11 @@ function doGet(e) {
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting mission...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting & Syncing...';
 
             try {
-                appData.missions.unshift(formData);
-                saveToLocalStorage();
-                await Promise.all([
-                    sendToNetlifyForms(formData),
-                    sendDataToGoogleSheet(formData)
-                ]);
-                await fetchGoogleSheetData();
-                showToast('Mission submitted & synced successfully!', 'success');
+                await syncAndRefreshAfterSubmit(formData);
+                showToast('Mission submitted & Google Sheets synchronized!', 'success');
                 document.getElementById('missionForm').reset();
             } catch (error) {
                 showToast('Mission recorded locally!', 'success');
@@ -1157,15 +1157,9 @@ function doGet(e) {
                 content: document.getElementById('qnaContent').value.trim(),
                 timestamp: new Date().toLocaleString()
             };
-            appData.qna.unshift(item);
-            saveToLocalStorage();
+            await syncAndRefreshAfterSubmit(item);
             renderQnaList();
-            await Promise.all([
-                sendToNetlifyForms(item),
-                sendDataToGoogleSheet(item)
-            ]);
-            await fetchGoogleSheetData();
-            showToast('Question posted & synced successfully!', 'success');
+            showToast('Question posted & Google Sheets synchronized!', 'success');
             document.getElementById('qnaForm').reset();
         }
 
@@ -1196,15 +1190,9 @@ function doGet(e) {
                 content: document.getElementById('peaceContent').value.trim(),
                 timestamp: new Date().toLocaleString()
             };
-            appData.peaceMsg.unshift(item);
-            saveToLocalStorage();
+            await syncAndRefreshAfterSubmit(item);
             renderPeaceMsgList();
-            await Promise.all([
-                sendToNetlifyForms(item),
-                sendDataToGoogleSheet(item)
-            ]);
-            await fetchGoogleSheetData();
-            showToast('Peace message posted & synced successfully!', 'success');
+            showToast('Peace message posted & Google Sheets synchronized!', 'success');
             document.getElementById('peaceMsgForm').reset();
         }
 
