@@ -529,105 +529,7 @@ function doGet(e) {
                 </div>
             </section>
 
-            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-md space-y-6">
-                <div class="flex items-center gap-3 border-b border-amber-100 pb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                        <i class="fa-solid fa-video"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 3</span>
-                            <h3 class="text-xl font-display font-black text-amber-950">3. Mission Submissions & Weekly Assignments</h3>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-0.5">Submit your weekly reflections and training assignments.</p>
-                    </div>
-                </div>
-
-                <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 md:p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h4 class="font-display font-extrabold text-amber-950 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-file-pen text-amber-600"></i> Mission & Assignment Submission
-                        </h4>
-                        <span class="text-xs bg-amber-200 text-amber-900 font-bold px-3 py-1 rounded-full">Weekly Reflections</span>
-                    </div>
-
-                    <div class="bg-white border border-amber-300 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-900 shadow-sm">
-                        <i class="fa-solid fa-circle-info text-amber-600 text-sm mt-0.5"></i>
-                        <div>
-                            <span class="font-bold">Notice regarding photo attachments:</span>
-                            <p class="text-amber-800 mt-0.5">Please submit any photo/image attachments directly to your designated <strong>Group Chat</strong>.</p>
-                        </div>
-                    </div>
-
-                    <form id="missionForm" onsubmit="handleMissionSubmit(event)" class="space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
-                                <input type="text" id="missionName" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Country <span class="text-rose-500">*</span></label>
-                                <select id="missionCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-                                    <option value="" disabled selected>Select Country...</option>
-                                    <option value="Aruba">Aruba</option>
-                                    <option value="Belgium">Belgium</option>
-                                    <option value="Bonaire">Bonaire</option>
-                                    <option value="China">China</option>
-                                    <option value="Curaçao">Curaçao</option>
-                                    <option value="France">France</option>
-                                    <option value="Germany">Germany</option>
-                                    <option value="India">India</option>
-                                    <option value="Malawi">Malawi</option>
-                                    <option value="Netherlands">Netherlands</option>
-                                    <option value="Sint Maarten">Sint Maarten</option>
-                                    <option value="South Africa">South Africa</option>
-                                    <option value="South Korea">South Korea</option>
-                                    <option value="United Kingdom">United Kingdom</option>
-                                    <option value="Zambia">Zambia</option>
-                                    <option value="Zimbabwe">Zimbabwe</option>
-                                    <option value="Other">Other Country</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">School / Organization <span class="text-rose-500">*</span></label>
-                                <input type="text" id="missionSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Year <span class="text-rose-500">*</span></label>
-                                <select id="missionYear" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-                                    <option value="2026" selected>2026</option>
-                                    <option value="2027">2027</option>
-                                    <option value="2028">2028</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1">Mission Week / Session <span class="text-rose-500">*</span></label>
-                                <select id="missionWeek" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-                                    <option value="" disabled selected>Select Mission...</option>
-                                    <option value="Session 1 Mission">Session 1 Mission: Understanding Peace Education Core Values</option>
-                                    <option value="Session 2 Mission">Session 2 Mission: Fostering Empathy in the Classroom</option>
-                                    <option value="Session 3 Mission">Session 3 Mission: Conflict Resolution & Dialogue</option>
-                                    <option value="Session 4 Mission">Session 4 Mission: Final Lesson Plan Presentation</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Mission Reflection / Content <span class="text-rose-500">*</span></label>
-                            <textarea id="missionContent" required rows="3" placeholder="Share your insights, lesson plan summaries, or reflections..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
-                        </div>
-
-                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Submit Weekly Mission
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- My Record Lookup -->
                 <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                     <h3 class="font-display font-extrabold text-teal-950 text-base flex items-center gap-2">
@@ -702,40 +604,42 @@ function doGet(e) {
                     </form>
                     <div id="qnaList" class="space-y-3 max-h-72 overflow-y-auto"></div>
                 </div>
+            </div>
 
-                <!-- Peace Messages Board -->
-                <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
-                    <h3 class="font-display font-extrabold text-teal-950 text-base flex items-center gap-2">
-                        <i class="fa-solid fa-heart text-rose-500"></i> Global Peace Messages
-                    </h3>
-                    <p class="text-xs text-slate-500">Leave warm encouragement for fellow educators.</p>
-                    <form id="peaceMsgForm" onsubmit="handlePeaceMsgSubmit(event)" class="space-y-3">
-                        <input type="text" id="peaceName" required placeholder="Your Name" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                        <select id="peaceCountry" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                            <option value="" disabled selected>Select Country...</option>
-                            <option value="Aruba">Aruba</option>
-                            <option value="Belgium">Belgium</option>
-                            <option value="Bonaire">Bonaire</option>
-                            <option value="China">China</option>
-                            <option value="Curaçao">Curaçao</option>
-                            <option value="France">France</option>
-                            <option value="Germany">Germany</option>
-                            <option value="India">India</option>
-                            <option value="Malawi">Malawi</option>
-                            <option value="Netherlands">Netherlands</option>
-                            <option value="Sint Maarten">Sint Maarten</option>
-                            <option value="South Africa">South Africa</option>
-                            <option value="South Korea">South Korea</option>
-                            <option value="United Kingdom">United Kingdom</option>
-                            <option value="Zambia">Zambia</option>
-                            <option value="Zimbabwe">Zimbabwe</option>
-                            <option value="Other">Other Country</option>
-                        </select>
-                        <textarea id="peaceContent" required rows="2" placeholder="Peace message..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
-                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2.5 rounded-xl">Send Message</button>
-                    </form>
-                    <div id="peaceMsgList" class="space-y-2 max-h-40 overflow-y-auto"></div>
-                </div>
+            <!-- Peace Messages Board (Bottom Full Width) -->
+            <div class="bg-white p-6 md:p-8 rounded-3xl border border-teal-100 shadow-sm space-y-4">
+                <h3 class="font-display font-extrabold text-teal-950 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-heart text-rose-500"></i> Global Peace Messages
+                </h3>
+                <p class="text-xs text-slate-500">Leave warm encouragement for fellow educators around the world.</p>
+                <form id="peaceMsgForm" onsubmit="handlePeaceMsgSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="peaceName" required placeholder="Your Name" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <select id="peaceCountry" required class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="" disabled selected>Select Country...</option>
+                        <option value="Aruba">Aruba</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Bonaire">Bonaire</option>
+                        <option value="China">China</option>
+                        <option value="Curaçao">Curaçao</option>
+                        <option value="France">France</option>
+                        <option value="Germany">Germany</option>
+                        <option value="India">India</option>
+                        <option value="Malawi">Malawi</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="Sint Maarten">Sint Maarten</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Zambia">Zambia</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Other">Other Country</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <textarea id="peaceContent" required rows="1" placeholder="Peace message..." class="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+                        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl whitespace-nowrap">Send Message</button>
+                    </div>
+                </form>
+                <div id="peaceMsgList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto pt-2"></div>
             </div>
         </div>
 
