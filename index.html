@@ -324,11 +324,11 @@ function doGet(e) {
                         <label class="block text-xs font-bold text-slate-700 mb-1">6. Session <span class="text-rose-500">*</span></label>
                         <select id="attSession" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
                             <option value="" disabled selected>Select Session...</option>
-                            <option value="Aug 8 (Sat) - Session 1">Aug 8 (Sat) - Session 1 (OT - Active)</option>
-                            <option value="Aug 15 (Sat) - Session 2" disabled>Aug 15 (Sat) - Session 2 (Coming Soon)</option>
-                            <option value="Aug 22 (Sat) - Session 3" disabled>Aug 22 (Sat) - Session 3 (Coming Soon)</option>
-                            <option value="Aug 29 (Sat) - Session 4" disabled>Aug 29 (Sat) - Session 4 (Coming Soon)</option>
-                            <option value="Sept 5 (Sat) - Session 5" disabled>Sept 5 (Sat) - Session 5 (Coming Soon)</option>
+                            <option value="Aug 8 (Sat) - Session 1">Aug 8 (Sat) - Session 1 (OT)</option>
+                            <option value="Aug 15 (Sat) - Session 2">Aug 15 (Sat) - Session 2</option>
+                            <option value="Aug 22 (Sat) - Session 3">Aug 22 (Sat) - Session 3</option>
+                            <option value="Aug 29 (Sat) - Session 4">Aug 29 (Sat) - Session 4</option>
+                            <option value="Sept 5 (Sat) - Session 5">Sept 5 (Sat) - Session 5</option>
                         </select>
                     </div>
 
@@ -700,7 +700,7 @@ function doGet(e) {
                         <textarea id="qnaContent" required rows="2" placeholder="Your question..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl">Post Question</button>
                     </form>
-                    <div id="qnaList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                    <div id="qnaList" class="space-y-3 max-h-72 overflow-y-auto"></div>
                 </div>
 
                 <!-- Peace Messages Board -->
@@ -821,7 +821,7 @@ function doGet(e) {
                         <button id="tabMissionsBtn" onclick="switchAdminTab('missions')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Mission Submissions</button>
                     </div>
                     <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <div class="w-full sm:w-40">
+                        <div class="w-full sm:w-36">
                             <select id="adminYearFilter" onchange="filterAdminTable()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
                                 <option value="">All Years</option>
                                 <option value="2026">2026</option>
@@ -829,7 +829,17 @@ function doGet(e) {
                                 <option value="2028">2028</option>
                             </select>
                         </div>
-                        <div class="w-full sm:w-64">
+                        <div class="w-full sm:w-44">
+                            <select id="adminSessionFilter" onchange="filterAdminTable()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                <option value="">All Sessions</option>
+                                <option value="Session 1">Session 1</option>
+                                <option value="Session 2">Session 2</option>
+                                <option value="Session 3">Session 3</option>
+                                <option value="Session 4">Session 4</option>
+                                <option value="Session 5">Session 5</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-56">
                             <input type="text" id="adminSearchInput" oninput="filterAdminTable()" placeholder="Search records..." class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
                         </div>
                     </div>
@@ -839,6 +849,7 @@ function doGet(e) {
                     <table class="w-full text-left border-collapse" id="adminTable">
                         <thead class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
                             <tr id="adminTableHeader">
+                                <th class="p-4 w-12">No.</th>
                                 <th class="p-4">Name</th>
                                 <th class="p-4">Country</th>
                                 <th class="p-4">School / Org</th>
@@ -850,7 +861,7 @@ function doGet(e) {
                         </thead>
                         <tbody id="adminTableBody" class="divide-y divide-slate-100 text-xs text-slate-700">
                             <tr>
-                                <td colspan="7" class="p-6 text-center text-slate-400">Loading records...</td>
+                                <td colspan="8" class="p-6 text-center text-slate-400">Loading records...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -873,7 +884,7 @@ function doGet(e) {
                 { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', year: '2026', week: 'Session 1 Mission', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', timestamp: new Date().toLocaleString('en-US') }
             ])),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || JSON.stringify([
-                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString('en-US') }
+                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString('en-US'), replies: [{ name: 'Admin', content: 'You can incorporate role-playing and collaborative conflict resolution discussions.', timestamp: new Date().toLocaleString('en-US') }] }
             ])),
             peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || JSON.stringify([
                 { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: new Date().toLocaleString('en-US') }
@@ -906,7 +917,21 @@ function doGet(e) {
                         } else if (item.type === 'mission') {
                             fetchedMissions.push(item);
                         } else if (item.type === 'qna') {
-                            fetchedQna.push(item);
+                            let replies = [];
+                            try {
+                                if (item.reflection) {
+                                    replies = JSON.parse(item.reflection);
+                                }
+                            } catch (e) {
+                                replies = [];
+                            }
+                            fetchedQna.push({
+                                name: item.name,
+                                country: item.country,
+                                content: item.content,
+                                timestamp: item.timestamp,
+                                replies: replies
+                            });
                         } else if (item.type === 'peaceMsg') {
                             fetchedPeaceMsg.push(item);
                         }
@@ -1165,12 +1190,51 @@ function doGet(e) {
                 name: document.getElementById('qnaName').value.trim(),
                 country: document.getElementById('qnaCountry').value,
                 content: document.getElementById('qnaContent').value.trim(),
-                timestamp: new Date().toLocaleString('en-US')
+                timestamp: new Date().toLocaleString('en-US'),
+                replies: []
             };
+            item.reflection = JSON.stringify(item.replies);
             await syncAndRefreshAfterSubmit(item);
             renderQnaList();
             showToast('Question posted & Google Sheets synchronized!', 'success');
             document.getElementById('qnaForm').reset();
+        }
+
+        async function handleReplySubmit(event, qIndex) {
+            event.preventDefault();
+            const pwdInput = document.getElementById(`replyAdminPwd_${qIndex}`);
+            const contentInput = document.getElementById(`replyContent_${qIndex}`);
+
+            if (pwdInput.value !== 'admin1234') {
+                showToast('Incorrect Admin Password (admin1234 required).', 'error');
+                return;
+            }
+
+            const replyItem = {
+                name: 'Admin',
+                content: contentInput.value.trim(),
+                timestamp: new Date().toLocaleString('en-US')
+            };
+
+            if (!appData.qna[qIndex].replies) {
+                appData.qna[qIndex].replies = [];
+            }
+            appData.qna[qIndex].replies.push(replyItem);
+            saveToLocalStorage();
+
+            const qItem = appData.qna[qIndex];
+            const payload = {
+                type: 'qna',
+                name: qItem.name,
+                country: qItem.country,
+                content: qItem.content,
+                timestamp: qItem.timestamp,
+                reflection: JSON.stringify(qItem.replies)
+            };
+
+            await sendDataToGoogleSheet(payload);
+            renderQnaList();
+            showToast('Admin reply added successfully!', 'success');
         }
 
         function renderQnaList() {
@@ -1180,15 +1244,42 @@ function doGet(e) {
                 list.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">No questions posted yet.</p>`;
                 return;
             }
-            list.innerHTML = appData.qna.map(q => `
-                <div class="bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 text-xs space-y-1">
-                    <div class="flex justify-between items-center text-slate-500 font-bold">
-                        <span>${q.name} (${q.country})</span>
-                        <span class="text-[10px] text-slate-400">${q.timestamp}</span>
+            list.innerHTML = appData.qna.map((q, idx) => {
+                const replies = q.replies || [];
+                return `
+                    <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 text-xs space-y-2">
+                        <div class="flex justify-between items-center text-slate-500 font-bold">
+                            <span>${q.name} (${q.country})</span>
+                            <span class="text-[10px] text-slate-400">${q.timestamp}</span>
+                        </div>
+                        <p class="text-indigo-950 font-medium">${q.content}</p>
+                        
+                        <!-- Replies Section -->
+                        <div class="pl-3 border-l-2 border-indigo-300 space-y-1.5 mt-2">
+                            ${replies.length > 0 ? replies.map(r => `
+                                <div class="bg-white/80 p-2 rounded-lg border border-indigo-100 text-[11px] space-y-0.5">
+                                    <div class="flex justify-between items-center font-bold text-teal-900">
+                                        <span><i class="fa-solid fa-shield-halved text-[9px] mr-1 text-teal-600"></i>${r.name}</span>
+                                        <span class="text-[9px] text-slate-400">${r.timestamp}</span>
+                                    </div>
+                                    <p class="text-slate-700">${r.content}</p>
+                                </div>
+                            `).join('') : '<p class="text-[10px] text-slate-400 italic">No replies yet.</p>'}
+                            
+                            <!-- Admin-Only Reply Input Form -->
+                            <form onsubmit="handleReplySubmit(event, ${idx})" class="mt-2 space-y-1.5">
+                                <div class="flex gap-1.5">
+                                    <input type="password" id="replyAdminPwd_${idx}" required placeholder="Admin Pwd (admin1234)" class="w-1/3 px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <input type="text" id="replyContent_${idx}" required placeholder="Write admin reply..." class="flex-1 px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white">
+                                </div>
+                                <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-shield-halved"></i> Post Admin Reply
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <p class="text-indigo-950 font-medium">${q.content}</p>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function handlePeaceMsgSubmit(e) {
@@ -1281,6 +1372,7 @@ function doGet(e) {
                 btnAtt.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
                 btnMis.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
                 header.innerHTML = `
+                    <th class="p-4 w-12">No.</th>
                     <th class="p-4">Name</th>
                     <th class="p-4">Country</th>
                     <th class="p-4">School / Org</th>
@@ -1309,6 +1401,7 @@ function doGet(e) {
             const tbody = document.getElementById('adminTableBody');
             const search = (document.getElementById('adminSearchInput').value || '').toLowerCase();
             const yearFilter = document.getElementById('adminYearFilter').value;
+            const sessionFilter = document.getElementById('adminSessionFilter') ? document.getElementById('adminSessionFilter').value : '';
 
             if (currentAdminTab === 'attendance') {
                 const filteredWithIndices = appData.attendance.map((a, idx) => ({ item: a, index: idx })).filter(({ item: a }) => {
@@ -1317,16 +1410,18 @@ function doGet(e) {
                         (a.school || '').toLowerCase().includes(search) || 
                         (a.session || '').toLowerCase().includes(search);
                     const matchesYear = !yearFilter || a.year === yearFilter;
-                    return matchesSearch && matchesYear;
+                    const matchesSession = !sessionFilter || (a.session || '').includes(sessionFilter);
+                    return matchesSearch && matchesYear && matchesSession;
                 });
 
                 if (filteredWithIndices.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No attendance records found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No attendance records found.</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = filteredWithIndices.map(({ item: a, index: idx }) => `
+                tbody.innerHTML = filteredWithIndices.map(({ item: a, index: idx }, displayIdx) => `
                     <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 text-slate-500 font-bold">${displayIdx + 1}</td>
                         <td class="p-4 font-bold text-slate-900">${a.name || ''}</td>
                         <td class="p-4">${a.country || ''}</td>
                         <td class="p-4">${a.school || ''}</td>
