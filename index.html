@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <!-- Chosen Palette: Deep Teal & Emerald Warm Neutrals -->
-    <!-- Application Structure Plan: Designed as a 3-section participant portal plus 50/50 utility tools and a full-width community footer, alongside a password-protected admin analytics dashboard. Section 1 handles live attendance check-ins for all 5 sessions. Section 2 provides video links and reflections (Live & Catch-up). Section 3 accepts mission homework and photo uploads with custom English file selection logic. Below, My Record Lookup and Q&A (with admin password verification for official replies) share a 2-column equal grid layout, followed by Global Peace Messages at the very bottom. Admin view features sequential row numbering, year & session filters, live charts, CSV exports, and Google Sheets two-way sync guide. -->
+    <!-- Application Structure Plan: Designed as a 3-section participant portal plus 50/50 utility tools and a full-width community footer, alongside a password-protected admin analytics dashboard. Section 1 handles live attendance check-ins. Section 2 provides video links and reflections. Section 3 handles mission homework submission with direct guidance to submit photo proof to assigned coordinators or group chats. Below, My Record Lookup and Q&A share a 2-column equal grid layout, followed by Global Peace Messages. -->
     <!-- Visualization & Content Choices: Replaced all SVGs with FontAwesome icon fonts and Chart.js Canvas components. Chart.js bar and doughnut charts run inside responsive container divs with controlled max-width and max-height. Dynamic JS handles local storage fallback and fetch sync with Google Apps Script. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -569,18 +569,18 @@ function doGet(e) {
                 </div>
             </section>
 
-            <!-- SECTION 3: MISSION SUBMISSION & PHOTO UPLOAD -->
+            <!-- SECTION 3: MISSION SUBMISSION -->
             <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-md space-y-5">
                 <div class="flex items-center gap-3 border-b border-amber-100 pb-4">
                     <div class="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                        <i class="fa-solid fa-camera"></i>
+                        <i class="fa-solid fa-paper-plane"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 3</span>
-                            <h3 class="text-xl font-display font-black text-amber-950">3. Mission Submission & Photo Upload</h3>
+                            <h3 class="text-xl font-display font-black text-amber-950">3. Mission Submission</h3>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">Submit your peace education mission homework along with photo proof or activity pictures.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Submit your peace education mission homework reflection below.</p>
                     </div>
                 </div>
 
@@ -660,24 +660,24 @@ function doGet(e) {
                         <textarea id="missionContent" required rows="3" placeholder="Describe your mission activity or peace education lesson implementation..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
                     </div>
 
-                    <div class="md:col-span-2 lg:col-span-3">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">8. Upload Photo Proof / Activity Image</label>
-                        <div class="flex flex-wrap items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-all">
-                            <label class="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-2">
-                                <i class="fa-solid fa-upload"></i> Choose File
-                                <input type="file" id="missionPhotoFile" accept="image/*" onchange="previewMissionPhoto(event)" class="hidden">
-                            </label>
-                            <span id="fileNameDisplay" class="text-xs text-slate-500 italic">No file chosen</span>
-                            <div id="photoPreviewContainer" class="hidden flex items-center gap-2">
-                                <img id="photoPreviewImg" src="" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-slate-300 shadow-sm">
-                                <button type="button" onclick="clearMissionPhoto()" class="text-rose-600 text-xs font-bold hover:underline"><i class="fa-solid fa-xmark"></i> Remove</button>
-                            </div>
+                    <!-- Photo Submission Notice Box (Replaces File Upload) -->
+                    <div class="md:col-span-2 lg:col-span-3 bg-amber-50/80 border border-amber-200 rounded-2xl p-4 flex items-start gap-3.5 text-amber-950 shadow-sm">
+                        <div class="w-9 h-9 rounded-xl bg-amber-200/60 text-amber-800 flex items-center justify-center shrink-0 text-base font-bold">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div class="text-xs space-y-1">
+                            <h4 class="font-bold text-amber-900 text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info text-amber-600"></i> Notice Regarding Mission Photo Proof & Pictures
+                            </h4>
+                            <p class="text-slate-600 leading-relaxed">
+                                Please submit any mission photo proof or activity images directly to your <strong>Group Chat</strong> or to your <strong>Assigned Coordinator</strong>. File upload on this page is no longer required.
+                            </p>
                         </div>
                     </div>
 
-                    <div class="md:col-span-2 lg:col-span-3 pt-2">
+                    <div class="md:col-span-2 lg:col-span-3 pt-1">
                         <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> Submit Mission & Photo
+                            <i class="fa-solid fa-paper-plane text-amber-200"></i> Submit Mission Reflection
                         </button>
                     </div>
                 </form>
@@ -971,28 +971,6 @@ function doGet(e) {
         let currentAdminTab = 'attendance';
         let attendanceChartInstance = null;
         let countryChartInstance = null;
-        let uploadedMissionPhotoBase64 = '';
-
-        function previewMissionPhoto(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('fileNameDisplay').textContent = file.name;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedMissionPhotoBase64 = e.target.result;
-                    document.getElementById('photoPreviewImg').src = uploadedMissionPhotoBase64;
-                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearMissionPhoto() {
-            uploadedMissionPhotoBase64 = '';
-            document.getElementById('missionPhotoFile').value = '';
-            document.getElementById('fileNameDisplay').textContent = 'No file chosen';
-            document.getElementById('photoPreviewContainer').classList.add('hidden');
-        }
 
         function saveToLocalStorage() {
             localStorage.setItem('hwpl_attendance', JSON.stringify(appData.attendance));
@@ -1241,8 +1219,8 @@ function doGet(e) {
                 year: document.getElementById('missionYear').value,
                 week: document.getElementById('missionWeek').value,
                 content: document.getElementById('missionContent').value.trim(),
-                reflection: uploadedMissionPhotoBase64,
-                photo: uploadedMissionPhotoBase64,
+                reflection: 'Photos sent directly to group chat / coordinator',
+                photo: '',
                 timestamp: getFormattedEnglishTimestamp()
             };
 
@@ -1253,9 +1231,8 @@ function doGet(e) {
 
             try {
                 await syncAndRefreshAfterSubmit(formData);
-                showToast('Mission & photo submitted successfully!', 'success');
+                showToast('Mission reflection submitted successfully!', 'success');
                 document.getElementById('missionForm').reset();
-                clearMissionPhoto();
             } catch (error) {
                 showToast('Mission recorded locally!', 'success');
             } finally {
@@ -1470,7 +1447,7 @@ function doGet(e) {
                     <th class="p-4">School / Org</th>
                     <th class="p-4">Position</th>
                     <th class="p-4">Mission</th>
-                    <th class="p-4">Content / Photo</th>
+                    <th class="p-4">Content</th>
                     <th class="p-4">Timestamp</th>
                     <th class="p-4 text-center">Action</th>
                 `;
@@ -1540,9 +1517,8 @@ function doGet(e) {
                         <td class="p-4">${m.school || ''}</td>
                         <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.position || 'N/A'}</span></td>
                         <td class="p-4 font-semibold text-amber-950">${m.week || ''}</td>
-                        <td class="p-4 space-y-1">
+                        <td class="p-4">
                             <p class="max-w-xs truncate text-slate-700" title="${m.content || ''}">${m.content || ''}</p>
-                            ${m.photo ? `<a href="${m.photo}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-700 font-bold hover:underline"><i class="fa-solid fa-image"></i> View Photo Proof</a>` : '<span class="text-[10px] text-slate-400">No Photo</span>'}
                         </td>
                         <td class="p-4 text-slate-400 text-[11px]">${m.timestamp || ''}</td>
                         <td class="p-4 text-center">
