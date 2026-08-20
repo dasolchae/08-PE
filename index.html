@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Chosen Palette: Deep Teal & Emerald Warm Neutrals -->
+    <!-- Application Structure Plan: Designed as a 3-section participant portal plus 50/50 utility tools and a full-width community footer, alongside a password-protected admin analytics dashboard. Section 1 handles live attendance check-ins for all 5 sessions. Section 2 provides video links and reflections (Live & Catch-up). Section 3 accepts mission homework and photo uploads with custom English file selection logic. Below, My Record Lookup and Q&A (with admin password verification for official replies) share a 2-column equal grid layout, followed by Global Peace Messages at the very bottom. Admin view features sequential row numbering, year & session filters, live charts, CSV exports, and Google Sheets two-way sync guide. -->
+    <!-- Visualization & Content Choices: Replaced all SVGs with FontAwesome icon fonts and Chart.js Canvas components. Chart.js bar and doughnut charts run inside responsive container divs with controlled max-width and max-height. Dynamic JS handles local storage fallback and fetch sync with Google Apps Script. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HWPL 08 Peace Education Training - Administration</title>
+    <title>HWPL 08 Peace Education Training - Portal & Administration</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font (Inter & Outfit) -->
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -30,6 +42,7 @@
                             700: '#225d5b',
                             800: '#1f4c4a',
                             900: '#1d403f',
+                            950: '#0f2928'
                         },
                         tape: '#f5e5a3'
                     }
@@ -37,8 +50,7 @@
             }
         }
     </script>
-    <!-- Chart.js for Admin Analytics Dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         .doodle-bg {
             background-color: #f7faf9;
@@ -55,6 +67,16 @@
 
         .poster-card-shadow {
             box-shadow: 0 10px 25px -5px rgba(39, 117, 114, 0.15), 0 8px 10px -6px rgba(39, 117, 114, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 260px;
+            max-height: 320px;
         }
 
         ::-webkit-scrollbar {
@@ -75,14 +97,16 @@
 </head>
 <body class="bg-slate-50 doodle-bg font-sans text-slate-800 min-h-screen flex flex-col">
 
+    <!-- Toast Notifications -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Site Gate Access Modal -->
     <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-5 transform transition-all">
             <div>
                 <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Restricted Access</span>
                 <h2 class="text-xl font-display font-extrabold text-teal-950 mt-2">HWPL 08 Peace Education Training</h2>
-                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Please enter the program access code to access the portal.</p>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Please enter the program access code to enter the portal.</p>
             </div>
             <form onsubmit="verifySitePasscode(event)" class="space-y-3">
                 <div>
@@ -101,6 +125,7 @@
         </div>
     </div>
 
+    <!-- Admin Authentication Modal -->
     <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center space-y-4">
             <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold">
@@ -108,7 +133,7 @@
             </div>
             <div>
                 <h3 class="text-lg font-display font-bold text-slate-900">Admin Authentication</h3>
-                <p class="text-xs text-slate-500 mt-1">Enter administrator password to access records.</p>
+                <p class="text-xs text-slate-500 mt-1">Enter administrator password to access management tools.</p>
             </div>
             <form onsubmit="verifyAdminPassword(event)" class="space-y-3">
                 <input type="password" id="adminPasswordInput" required placeholder="Admin Password" class="w-full text-center px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-bold tracking-wider focus:ring-2 focus:ring-teal-500 focus:outline-none">
@@ -117,18 +142,19 @@
                     <button type="submit" class="w-1/2 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-sm">Unlock Admin</button>
                 </div>
             </form>
-            <p class="text-[11px] text-slate-400">Authorized personnel only</p>
+            <p class="text-[11px] text-slate-400">Default Password: <code class="font-bold text-slate-600">admin1234</code></p>
         </div>
     </div>
 
+    <!-- Google Apps Script Guide Modal -->
     <div id="appsScriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-3xl w-full shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-display font-bold text-slate-900"><i class="fa-solid fa-code text-teal-600 mr-2"></i> Google Apps Script Integration & Two-Way Sync Guide</h3>
+                <h3 class="text-lg font-display font-bold text-slate-900"><i class="fa-solid fa-code text-teal-600 mr-2"></i> Google Apps Script Integration Guide</h3>
                 <button onclick="closeAppsScriptGuide()" class="text-slate-400 hover:text-slate-700 font-bold text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-                To allow the web app to load and accumulate data directly from Google Sheets (Two-way sync), update your Google Apps Script (`Code.gs`) with both <strong>doPost</strong> and <strong>doGet</strong> functions:
+                Paste the following code into your Google Apps Script editor (<code class="bg-slate-100 px-1 py-0.5 rounded text-teal-800">Code.gs</code>) to enable two-way sync between this web portal and Google Sheets:
             </p>
             <div class="bg-slate-900 text-slate-100 p-4 rounded-xl text-[11px] font-mono overflow-x-auto space-y-2">
                 <pre><code>// Google Apps Script (Code.gs)
@@ -136,7 +162,17 @@ function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
-  sheet.appendRow([data.timestamp, data.type, data.name, data.country, data.school, data.position || '', data.session || data.week || '', data.content || '', data.reflection || '']);
+  sheet.appendRow([
+    data.timestamp || new Date().toLocaleString('en-US'),
+    data.type || '',
+    data.name || '',
+    data.country || '',
+    data.school || '',
+    data.position || '',
+    data.session || data.week || '',
+    data.content || '',
+    data.reflection || ''
+  ]);
   return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -147,7 +183,7 @@ function doGet(e) {
   var result = [];
   for (var i = 1; i &lt; rows.length; i++) {
     var row = rows[i];
-    if (row[0]) {
+    if (row[0] || row[2]) {
       result.push({
         timestamp: row[0],
         type: row[1],
@@ -171,6 +207,7 @@ function doGet(e) {
         </div>
     </div>
 
+    <!-- Header / Navigation -->
     <header class="bg-white/90 backdrop-blur-md border-b border-teal-100 sticky top-0 z-40 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -179,14 +216,14 @@ function doGet(e) {
                         <span class="bg-teal-100 text-teal-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">HWPL 08</span>
                         <h1 class="font-display font-extrabold text-teal-900 text-base md:text-lg leading-none">HWPL 08 PEACE EDUCATION TRAINING</h1>
                     </div>
-                    <p class="text-xs text-teal-600 font-medium mt-0.5">HWPL 08 Peace Education Training Portal</p>
+                    <p class="text-xs text-teal-600 font-medium mt-0.5">Peace Educator Portal & Administration</p>
                 </div>
             </div>
 
-            <!-- Mode Switcher -->
+            <!-- View Switcher -->
             <div class="flex items-center bg-teal-50 p-1 rounded-xl border border-teal-200">
                 <button id="btnStudentMode" onclick="switchMode('student')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm bg-white text-teal-800">
-                    <i class="fa-solid fa-user-graduate mr-1 text-teal-600"></i> Portal
+                    <i class="fa-solid fa-user-graduate mr-1 text-teal-600"></i> Portal View
                 </button>
                 <button id="btnAdminMode" onclick="switchMode('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-teal-800 transition-all">
                     <i class="fa-solid fa-user-shield mr-1"></i> Admin Dashboard
@@ -197,10 +234,10 @@ function doGet(e) {
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
 
-        <!-- ==================== STUDENT VIEW ==================== -->
+        <!-- ==================== STUDENT / PARTICIPANT PORTAL VIEW ==================== -->
         <div id="studentView" class="space-y-8">
             
-            <!-- Hero Banner -->
+            <!-- Banner Hero -->
             <div class="bg-white rounded-3xl p-6 md:p-8 border border-teal-100 poster-card-shadow relative overflow-hidden">
                 <div class="absolute -right-6 -bottom-6 text-teal-100 opacity-60 pointer-events-none">
                     <i class="fa-solid fa-paper-plane text-[160px] transform -rotate-12"></i>
@@ -240,13 +277,14 @@ function doGet(e) {
                             EVERY SATURDAY
                         </div>
                         <div class="pt-1 text-xs space-y-0.5 font-semibold text-teal-50">
-                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30</p>
-                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 14:30</p>
+                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30 AM</p>
+                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 2:30 PM</p>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- SECTION 1: ATTENDANCE CHECK -->
             <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-teal-200 shadow-md space-y-5">
                 <div class="flex items-center gap-3 border-b border-teal-100 pb-4">
                     <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
@@ -257,7 +295,7 @@ function doGet(e) {
                             <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 1</span>
                             <h3 class="text-xl font-display font-black text-teal-950">1. Attendance Check</h3>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">Please check in your attendance for each live session.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Please check in your attendance for each live session. All sessions are open.</p>
                     </div>
                 </div>
 
@@ -340,6 +378,7 @@ function doGet(e) {
                 </form>
             </section>
 
+            <!-- SECTION 2: RECORDED VIDEO LIST & CATCH-UP -->
             <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-indigo-200 shadow-md space-y-6">
                 <div class="flex items-center gap-3 border-b border-indigo-100 pb-4">
                     <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
@@ -350,11 +389,11 @@ function doGet(e) {
                             <span class="bg-indigo-100 text-indigo-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 2</span>
                             <h3 class="text-xl font-display font-black text-indigo-950">2. Recorded Video List & Catch-up Attendance</h3>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">Missed a live session? Click the links below to watch session recordings directly, then submit your reflection to automatically update your attendance.</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Missed a live session or want to reflect? Watch session recordings and submit your reflection below.</p>
                     </div>
                 </div>
 
-                <!-- Video Cards Grid with Direct Clickable Links -->
+                <!-- Video Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
                         <div class="space-y-1.5">
@@ -394,7 +433,7 @@ function doGet(e) {
                             <p class="text-[11px] text-slate-500">Conflict Resolution & Dialogue Methods</p>
                         </div>
                         <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -408,7 +447,7 @@ function doGet(e) {
                             <p class="text-[11px] text-slate-500">Peace Culture in School Curriculum</p>
                         </div>
                         <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -422,17 +461,18 @@ function doGet(e) {
                             <p class="text-[11px] text-slate-500">Final Lesson Plan & Certification</p>
                         </div>
                         <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon (Not Uploaded)
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
                 </div>
 
+                <!-- Video Reflection Form -->
                 <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-5 md:p-6 space-y-4">
                     <div class="flex items-center justify-between">
                         <h4 class="font-display font-extrabold text-indigo-950 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-pen-nib text-indigo-600"></i> Live Session & Video Reflection Form
+                            <i class="fa-solid fa-pen-nib text-indigo-600"></i> Video Reflection & Attendance Form
                         </h4>
-                        <span class="text-xs bg-indigo-200 text-indigo-900 font-bold px-3 py-1 rounded-full">For Live & Catch-up Participants</span>
+                        <span class="text-xs bg-indigo-200 text-indigo-900 font-bold px-3 py-1 rounded-full">Live & Catch-up Participants</span>
                     </div>
 
                     <form id="videoAttendanceForm" onsubmit="handleVideoAttendanceSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -500,9 +540,9 @@ function doGet(e) {
                                 <option value="" disabled selected>Select Session...</option>
                                 <option value="Aug 8 (Sat) - Session 1">Aug 8 (Sat) - Session 1 (OT)</option>
                                 <option value="Aug 15 (Sat) - Session 2">Aug 15 (Sat) - Session 2 (Active)</option>
-                                <option value="Aug 22 (Sat) - Session 3" disabled>Aug 22 (Sat) - Session 3 (Coming Soon)</option>
-                                <option value="Aug 29 (Sat) - Session 4" disabled>Aug 29 (Sat) - Session 4 (Coming Soon)</option>
-                                <option value="Sept 5 (Sat) - Session 5" disabled>Sept 5 (Sat) - Session 5 (Coming Soon)</option>
+                                <option value="Aug 22 (Sat) - Session 3">Aug 22 (Sat) - Session 3</option>
+                                <option value="Aug 29 (Sat) - Session 4">Aug 29 (Sat) - Session 4</option>
+                                <option value="Sept 5 (Sat) - Session 5">Sept 5 (Sat) - Session 5</option>
                             </select>
                         </div>
 
@@ -529,6 +569,121 @@ function doGet(e) {
                 </div>
             </section>
 
+            <!-- SECTION 3: MISSION SUBMISSION & PHOTO UPLOAD -->
+            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-amber-200 shadow-md space-y-5">
+                <div class="flex items-center gap-3 border-b border-amber-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">SECTION 3</span>
+                            <h3 class="text-xl font-display font-black text-amber-950">3. Mission Submission & Photo Upload</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Submit your peace education mission homework along with photo proof or activity pictures.</p>
+                    </div>
+                </div>
+
+                <form id="missionForm" onsubmit="handleMissionSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">1. Full Name <span class="text-rose-500">*</span></label>
+                        <input type="text" id="missionName" required placeholder="e.g. Maria Santos" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">2. Country <span class="text-rose-500">*</span></label>
+                        <select id="missionCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">3. School / Organization <span class="text-rose-500">*</span></label>
+                        <input type="text" id="missionSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">4. Position <span class="text-rose-500">*</span></label>
+                        <select id="missionPosition" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Position...</option>
+                            <option value="Ministry Official">Ministry Official</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Vice Principal">Vice Principal</option>
+                            <option value="Teacher / Educator">Teacher / Educator</option>
+                            <option value="School Administrator">School Administrator</option>
+                            <option value="Student">Student</option>
+                            <option value="Community Leader">Community Leader</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">5. Year <span class="text-rose-500">*</span></label>
+                        <select id="missionYear" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                            <option value="2026" selected>2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">6. Target Mission <span class="text-rose-500">*</span></label>
+                        <select id="missionWeek" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Mission...</option>
+                            <option value="Session 1 Mission (Aug 8)">Session 1 Mission (Aug 8)</option>
+                            <option value="Session 2 Mission (Aug 15)">Session 2 Mission (Aug 15)</option>
+                            <option value="Session 3 Mission (Aug 22)">Session 3 Mission (Aug 22)</option>
+                            <option value="Session 4 Mission (Aug 29)">Session 4 Mission (Aug 29)</option>
+                            <option value="Session 5 Mission (Sept 5)">Session 5 Mission (Sept 5)</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">7. Mission Reflection / Content <span class="text-rose-500">*</span></label>
+                        <textarea id="missionContent" required rows="3" placeholder="Describe your mission activity or peace education lesson implementation..." class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">8. Upload Photo Proof / Activity Image</label>
+                        <div class="flex flex-wrap items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-all">
+                            <label class="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition-all shadow-sm flex items-center gap-2">
+                                <i class="fa-solid fa-upload"></i> Choose File
+                                <input type="file" id="missionPhotoFile" accept="image/*" onchange="previewMissionPhoto(event)" class="hidden">
+                            </label>
+                            <span id="fileNameDisplay" class="text-xs text-slate-500 italic">No file chosen</span>
+                            <div id="photoPreviewContainer" class="hidden flex items-center gap-2">
+                                <img id="photoPreviewImg" src="" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-slate-300 shadow-sm">
+                                <button type="button" onclick="clearMissionPhoto()" class="text-rose-600 text-xs font-bold hover:underline"><i class="fa-solid fa-xmark"></i> Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3 pt-2">
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-cloud-arrow-up text-amber-200"></i> Submit Mission & Photo
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 50/50 Split Section: My Record Lookup & Q&A Support -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- My Record Lookup -->
                 <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
@@ -606,7 +761,7 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- Peace Messages Board (Bottom Full Width) -->
+            <!-- Global Peace Messages Board (Full Width Bottom) -->
             <div class="bg-white p-6 md:p-8 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                 <h3 class="font-display font-extrabold text-teal-950 text-lg flex items-center gap-2">
                     <i class="fa-solid fa-heart text-rose-500"></i> Global Peace Messages
@@ -614,7 +769,7 @@ function doGet(e) {
                 <p class="text-xs text-slate-500">Leave warm encouragement for fellow educators around the world.</p>
                 <form id="peaceMsgForm" onsubmit="handlePeaceMsgSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <input type="text" id="peaceName" required placeholder="Your Name" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                    <select id="peaceCountry" required class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <select id="peaceCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
                         <option value="" disabled selected>Select Country...</option>
                         <option value="Aruba">Aruba</option>
                         <option value="Belgium">Belgium</option>
@@ -643,7 +798,7 @@ function doGet(e) {
             </div>
         </div>
 
-        <!-- ==================== ADMIN VIEW ==================== -->
+        <!-- ==================== ADMIN ANALYTICS VIEW ==================== -->
         <div id="adminView" class="hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-3xl border border-teal-100 shadow-sm">
                 <div>
@@ -664,6 +819,7 @@ function doGet(e) {
                 </div>
             </div>
 
+            <!-- Metric Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-teal-100 shadow-sm flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-xl font-bold">
@@ -703,21 +859,23 @@ function doGet(e) {
                 </div>
             </div>
 
+            <!-- Admin Visualizations -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                     <h4 class="font-display font-extrabold text-teal-950 text-base">Attendance by Session</h4>
-                    <div class="h-64 relative">
+                    <div class="chart-container">
                         <canvas id="attendanceChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                     <h4 class="font-display font-extrabold text-teal-950 text-base">Submissions by Country</h4>
-                    <div class="h-64 relative">
+                    <div class="chart-container">
                         <canvas id="countryChart"></canvas>
                     </div>
                 </div>
             </div>
 
+            <!-- Admin Table -->
             <div class="bg-white rounded-3xl border border-teal-100 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
                     <div class="flex items-center gap-2">
@@ -775,29 +933,66 @@ function doGet(e) {
 
     </main>
 
+    <!-- JavaScript Application Logic -->
     <script> 
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynymQgGAZ-LMwcIUXgosBonlPkAasmqv6sPWDp-Qg0sxND_wig7qL4BuBiM4xCYcny5w/exec';
 
+        // Format Date to English AM/PM
+        function getFormattedEnglishTimestamp() {
+            return new Date().toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
+
+        // Base Application State
         let appData = {
             attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') },
-                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') },
-                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: new Date().toLocaleString('en-US') }
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 15 (Sat) - Session 2', timestamp: getFormattedEnglishTimestamp() }
             ])),
             missions: JSON.parse(localStorage.getItem('hwpl_missions') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', year: '2026', week: 'Session 1 Mission', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', timestamp: new Date().toLocaleString('en-US') }
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', week: 'Session 1 Mission (Aug 8)', content: 'Peace education starts with fostering empathy in the classroom through open dialogue.', photo: '', timestamp: getFormattedEnglishTimestamp() }
             ])),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || JSON.stringify([
-                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: new Date().toLocaleString('en-US'), replies: [{ name: 'Admin', content: 'You can incorporate role-playing and collaborative conflict resolution discussions.', timestamp: new Date().toLocaleString('en-US') }] }
+                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: getFormattedEnglishTimestamp(), replies: [{ name: 'Admin', content: 'You can incorporate role-playing and collaborative conflict resolution discussions.', timestamp: getFormattedEnglishTimestamp() }] }
             ])),
             peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || JSON.stringify([
-                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: new Date().toLocaleString('en-US') }
+                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: getFormattedEnglishTimestamp() }
             ]))
         };
 
         let currentAdminTab = 'attendance';
         let attendanceChartInstance = null;
         let countryChartInstance = null;
+        let uploadedMissionPhotoBase64 = '';
+
+        function previewMissionPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedMissionPhotoBase64 = e.target.result;
+                    document.getElementById('photoPreviewImg').src = uploadedMissionPhotoBase64;
+                    document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearMissionPhoto() {
+            uploadedMissionPhotoBase64 = '';
+            document.getElementById('missionPhotoFile').value = '';
+            document.getElementById('fileNameDisplay').textContent = 'No file chosen';
+            document.getElementById('photoPreviewContainer').classList.add('hidden');
+        }
 
         function saveToLocalStorage() {
             localStorage.setItem('hwpl_attendance', JSON.stringify(appData.attendance));
@@ -854,7 +1049,7 @@ function doGet(e) {
                     }
                 }
             } catch (error) {
-                console.error('Failed to fetch from Google Sheets (using local data):', error);
+                console.error('Fetching from Google Sheets failed (using local data):', error);
             }
         }
 
@@ -934,23 +1129,6 @@ function doGet(e) {
             document.getElementById('appsScriptModal').classList.add('hidden');
         }
 
-        async function sendToNetlifyForms(formData) {
-            const body = new URLSearchParams();
-            body.append('form-name', formData.type);
-            for (const key in formData) {
-                body.append(key, formData[key]);
-            }
-            try {
-                await fetch('/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: body.toString()
-                });
-            } catch (error) {
-                console.error('Netlify Forms error:', error);
-            }
-        }
-
         async function sendDataToGoogleSheet(payload) {
             try {
                 await fetch(SCRIPT_URL, {
@@ -966,18 +1144,13 @@ function doGet(e) {
             }
         }
 
-        // Automatic re-fetching and synchronization after submission
         async function syncAndRefreshAfterSubmit(payload) {
-            appData[payload.type === 'attendance' ? 'attendance' : payload.type === 'mission' ? 'missions' : payload.type === 'qna' ? 'qna' : 'peaceMsg'].unshift(payload);
+            const key = payload.type === 'attendance' ? 'attendance' : payload.type === 'mission' ? 'missions' : payload.type === 'qna' ? 'qna' : 'peaceMsg';
+            appData[key].unshift(payload);
             saveToLocalStorage();
 
-            await Promise.all([
-                sendToNetlifyForms(payload),
-                sendDataToGoogleSheet(payload)
-            ]);
-
-            // Allow Google Sheets time to append row, then automatically fetch latest dataset and update admin view
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await sendDataToGoogleSheet(payload);
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await fetchGoogleSheetData();
             
             const adminView = document.getElementById('adminView');
@@ -996,13 +1169,13 @@ function doGet(e) {
                 position: document.getElementById('attPosition').value,
                 year: document.getElementById('attYear').value,
                 session: document.getElementById('attSession').value,
-                timestamp: new Date().toLocaleString('en-US')
+                timestamp: getFormattedEnglishTimestamp()
             };
 
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting & Syncing...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
                 await syncAndRefreshAfterSubmit(formData);
@@ -1026,7 +1199,7 @@ function doGet(e) {
             const session = document.getElementById('vidAttSession').value;
             const partType = document.getElementById('vidAttType').value;
             const content = document.getElementById('vidAttContent').value.trim();
-            const timestamp = new Date().toLocaleString('en-US');
+            const timestamp = getFormattedEnglishTimestamp();
 
             const attendancePayload = {
                 type: 'attendance',
@@ -1043,11 +1216,11 @@ function doGet(e) {
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating & Syncing...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
 
             try {
                 await syncAndRefreshAfterSubmit(attendancePayload);
-                showToast('Reflection submitted & attendance synchronized!', 'success');
+                showToast('Reflection submitted & attendance updated!', 'success');
                 document.getElementById('videoAttendanceForm').reset();
             } catch (error) {
                 showToast('Recorded locally & attendance updated!', 'success');
@@ -1064,21 +1237,25 @@ function doGet(e) {
                 name: document.getElementById('missionName').value.trim(),
                 country: document.getElementById('missionCountry').value,
                 school: document.getElementById('missionSchool').value.trim(),
+                position: document.getElementById('missionPosition').value,
                 year: document.getElementById('missionYear').value,
                 week: document.getElementById('missionWeek').value,
                 content: document.getElementById('missionContent').value.trim(),
-                timestamp: new Date().toLocaleString('en-US')
+                reflection: uploadedMissionPhotoBase64,
+                photo: uploadedMissionPhotoBase64,
+                timestamp: getFormattedEnglishTimestamp()
             };
 
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting & Syncing...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
                 await syncAndRefreshAfterSubmit(formData);
-                showToast('Mission submitted & Google Sheets synchronized!', 'success');
+                showToast('Mission & photo submitted successfully!', 'success');
                 document.getElementById('missionForm').reset();
+                clearMissionPhoto();
             } catch (error) {
                 showToast('Mission recorded locally!', 'success');
             } finally {
@@ -1094,7 +1271,7 @@ function doGet(e) {
                 name: document.getElementById('qnaName').value.trim(),
                 country: document.getElementById('qnaCountry').value,
                 content: document.getElementById('qnaContent').value.trim(),
-                timestamp: new Date().toLocaleString('en-US'),
+                timestamp: getFormattedEnglishTimestamp(),
                 replies: []
             };
             item.reflection = JSON.stringify(item.replies);
@@ -1110,14 +1287,14 @@ function doGet(e) {
             const contentInput = document.getElementById(`replyContent_${qIndex}`);
 
             if (pwdInput.value !== 'admin1234') {
-                showToast('Incorrect Admin Password (admin1234 required).', 'error');
+                showToast('Incorrect Admin Password.', 'error');
                 return;
             }
 
             const replyItem = {
                 name: 'Admin',
                 content: contentInput.value.trim(),
-                timestamp: new Date().toLocaleString('en-US')
+                timestamp: getFormattedEnglishTimestamp()
             };
 
             if (!appData.qna[qIndex].replies) {
@@ -1138,7 +1315,7 @@ function doGet(e) {
 
             await sendDataToGoogleSheet(payload);
             renderQnaList();
-            showToast('Admin reply added successfully!', 'success');
+            showToast('Admin reply posted successfully!', 'success');
         }
 
         function renderQnaList() {
@@ -1158,7 +1335,6 @@ function doGet(e) {
                         </div>
                         <p class="text-indigo-950 font-medium">${q.content}</p>
                         
-                        <!-- Replies Section -->
                         <div class="pl-3 border-l-2 border-indigo-300 space-y-1.5 mt-2">
                             ${replies.length > 0 ? replies.map(r => `
                                 <div class="bg-white/80 p-2 rounded-lg border border-indigo-100 text-[11px] space-y-0.5">
@@ -1170,10 +1346,9 @@ function doGet(e) {
                                 </div>
                             `).join('') : '<p class="text-[10px] text-slate-400 italic">No replies yet.</p>'}
                             
-                            <!-- Admin-Only Reply Input Form -->
                             <form onsubmit="handleReplySubmit(event, ${idx})" class="mt-2 space-y-1.5">
                                 <div class="flex gap-1.5">
-                                    <input type="password" id="replyAdminPwd_${idx}" required placeholder="Admin Pwd (admin1234)" class="w-1/3 px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <input type="password" id="replyAdminPwd_${idx}" required placeholder="Admin Password" class="w-1/3 px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white">
                                     <input type="text" id="replyContent_${idx}" required placeholder="Write admin reply..." class="flex-1 px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-1 focus:ring-indigo-500 focus:outline-none bg-white">
                                 </div>
                                 <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-1.5 rounded-lg text-[11px] font-bold shadow-sm flex items-center justify-center gap-1">
@@ -1193,7 +1368,7 @@ function doGet(e) {
                 name: document.getElementById('peaceName').value.trim(),
                 country: document.getElementById('peaceCountry').value,
                 content: document.getElementById('peaceContent').value.trim(),
-                timestamp: new Date().toLocaleString('en-US')
+                timestamp: getFormattedEnglishTimestamp()
             };
             await syncAndRefreshAfterSubmit(item);
             renderPeaceMsgList();
@@ -1289,11 +1464,13 @@ function doGet(e) {
                 btnMis.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
                 btnAtt.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
                 header.innerHTML = `
+                    <th class="p-4 w-12">No.</th>
                     <th class="p-4">Name</th>
                     <th class="p-4">Country</th>
                     <th class="p-4">School / Org</th>
-                    <th class="p-4">Week / Session</th>
-                    <th class="p-4">Content / Reflection</th>
+                    <th class="p-4">Position</th>
+                    <th class="p-4">Mission</th>
+                    <th class="p-4">Content / Photo</th>
                     <th class="p-4">Timestamp</th>
                     <th class="p-4 text-center">Action</th>
                 `;
@@ -1351,17 +1528,22 @@ function doGet(e) {
                 });
 
                 if (filteredWithIndices.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No mission submissions found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">No mission submissions found.</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = filteredWithIndices.map(({ item: m, index: idx }) => `
+                tbody.innerHTML = filteredWithIndices.map(({ item: m, index: idx }, displayIdx) => `
                     <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 text-slate-500 font-bold">${displayIdx + 1}</td>
                         <td class="p-4 font-bold text-slate-900">${m.name || ''}</td>
                         <td class="p-4">${m.country || ''}</td>
                         <td class="p-4">${m.school || ''}</td>
-                        <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.week || ''}</span></td>
-                        <td class="p-4 max-w-xs truncate" title="${m.content || ''}">${m.content || ''}</td>
+                        <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.position || 'N/A'}</span></td>
+                        <td class="p-4 font-semibold text-amber-950">${m.week || ''}</td>
+                        <td class="p-4 space-y-1">
+                            <p class="max-w-xs truncate text-slate-700" title="${m.content || ''}">${m.content || ''}</p>
+                            ${m.photo ? `<a href="${m.photo}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-amber-700 font-bold hover:underline"><i class="fa-solid fa-image"></i> View Photo Proof</a>` : '<span class="text-[10px] text-slate-400">No Photo</span>'}
+                        </td>
                         <td class="p-4 text-slate-400 text-[11px]">${m.timestamp || ''}</td>
                         <td class="p-4 text-center">
                             <button onclick="deleteRecord('missions', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
@@ -1397,14 +1579,14 @@ function doGet(e) {
         function exportToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
             if (currentAdminTab === 'attendance') {
-                csvContent += "Name,Country,School,Position,Year,Session,Timestamp\n";
-                appData.attendance.forEach(a => {
-                    csvContent += `"${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
+                csvContent += "No,Name,Country,School,Position,Year,Session,Timestamp\n";
+                appData.attendance.forEach((a, i) => {
+                    csvContent += `"${i+1}","${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
                 });
             } else {
-                csvContent += "Name,Country,School,Year,Week,Content,Timestamp\n";
-                appData.missions.forEach(m => {
-                    csvContent += `"${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.year || ''}","${m.week || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
+                csvContent += "No,Name,Country,School,Position,Year,Mission,Content,Timestamp\n";
+                appData.missions.forEach((m, i) => {
+                    csvContent += `"${i+1}","${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.position || ''}","${m.year || ''}","${m.week || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
                 });
             }
             const encodedUri = encodeURI(csvContent);
