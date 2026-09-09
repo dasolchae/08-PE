@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 추가된 라이브러리: jsPDF (단독으로 사용하여 PDF 렌더링 에러 해결) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -22,6 +25,7 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
+                        signature: ['"Brush Script MT"', 'cursive'] // 수료증 서명용 폰트
                     },
                     colors: {
                         teal: {
@@ -786,6 +790,45 @@ function doGet(e) {
                 </div>
             </div>
 
+            <!-- 수료증 다운로드 섹션 -->
+            <section class="bg-white p-6 md:p-8 rounded-3xl border-2 border-yellow-300 shadow-md space-y-4">
+                <h3 class="font-display font-extrabold text-yellow-900 text-xl flex items-center gap-2">
+                    <i class="fa-solid fa-certificate text-yellow-500"></i> Certificate of Completion
+                </h3>
+                <p class="text-xs text-slate-500">Enter your details to check your eligibility. You need at least <strong class="text-yellow-700">4 attendance records</strong> to generate and download the certificate.</p>
+                <form id="certForm" onsubmit="handleCertCheck(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <input type="text" id="certName" required placeholder="Your Name" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                    <select id="certCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                        <option value="" disabled selected>Select Country...</option>
+                        <option value="Aruba">Aruba</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Bonaire">Bonaire</option>
+                        <option value="China">China</option>
+                        <option value="Curaçao">Curaçao</option>
+                        <option value="France">France</option>
+                        <option value="Germany">Germany</option>
+                        <option value="India">India</option>
+                        <option value="Malawi">Malawi</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="Sint Maarten">Sint Maarten</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Zambia">Zambia</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Other">Other Country</option>
+                    </select>
+                    <input type="text" id="certSchool" required placeholder="School / Organization" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500 focus:outline-none">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Check & Generate
+                    </button>
+                </form>
+                
+                <div id="certResultContainer" class="hidden pt-4 border-t border-slate-100">
+                    <!-- 결과 메시지가 동적으로 삽입됩니다 -->
+                </div>
+            </section>
+
             <div class="bg-white p-6 md:p-8 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                 <h3 class="font-display font-extrabold text-teal-950 text-lg flex items-center gap-2">
                     <i class="fa-solid fa-heart text-rose-500"></i> Global Peace Messages
@@ -953,6 +996,55 @@ function doGet(e) {
 
     </main>
 
+    <!-- 수료증 렌더링용 숨겨진 템플릿 (화면 밖으로 배치하여 사용자는 보지 못하게 함) -->
+    <div id="certificateTemplateWrapper" style="position: absolute; left: -9999px; top: -9999px;">
+        <div id="certificateTemplate" class="w-[850px] h-[600px] bg-white relative p-12 overflow-hidden flex flex-col justify-center items-center text-center font-serif border-[16px] border-double border-yellow-600 shadow-2xl">
+            <!-- 배경 패턴 및 장식 -->
+            <div class="absolute inset-0 bg-yellow-50/60" style="background-image: radial-gradient(#d97706 1px, transparent 1px); background-size: 40px 40px; opacity: 0.1;"></div>
+            
+            <div class="absolute top-0 left-0 w-32 h-32 border-t-[10px] border-l-[10px] border-yellow-700 m-5"></div>
+            <div class="absolute top-0 right-0 w-32 h-32 border-t-[10px] border-r-[10px] border-yellow-700 m-5"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 border-b-[10px] border-l-[10px] border-yellow-700 m-5"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 border-b-[10px] border-r-[10px] border-yellow-700 m-5"></div>
+            
+            <div class="relative z-10 space-y-6 w-full flex flex-col items-center">
+                <div>
+                    <h1 class="text-5xl font-black text-yellow-800 tracking-[0.2em] mb-1">CERTIFICATE</h1>
+                    <h2 class="text-xl font-medium text-slate-700 uppercase tracking-[0.3em]">of Completion</h2>
+                </div>
+                
+                <div class="w-24 h-1.5 bg-yellow-500 rounded-full my-2"></div>
+                
+                <p class="text-sm text-slate-500 uppercase tracking-widest font-semibold mt-4">This is proudly presented to</p>
+                
+                <h3 id="renderCertName" class="text-4xl font-bold text-slate-900 border-b-2 border-yellow-600/50 pb-2 inline-block min-w-[350px] font-sans">Name Placeholder</h3>
+                
+                <p class="text-sm text-slate-500 mt-2">from <span id="renderCertSchool" class="font-bold text-slate-800 text-base">School Placeholder</span></p>
+                
+                <p class="text-sm text-slate-700 max-w-xl mx-auto leading-relaxed mt-6 italic">
+                    For successfully completing the <strong>2026 2nd HWPL Peace Education Training</strong>.<br> We commend your dedication to fostering a culture of peace and empowering future generations around the world.
+                </p>
+                
+                <div class="flex justify-between items-end w-full px-16 mt-10">
+                    <div class="text-center border-t border-slate-400 pt-2 w-40">
+                        <p class="text-sm font-bold text-slate-800" id="renderCertDate">Sept 5, 2026</p>
+                        <p class="text-[10px] text-slate-500 uppercase mt-1 tracking-wider">Date of Issue</p>
+                    </div>
+                    
+                    <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center border-[5px] border-yellow-600 relative shadow-inner">
+                        <i class="fa-solid fa-dove text-4xl text-yellow-700"></i>
+                        <div class="absolute inset-0 border-2 border-dashed border-yellow-700 rounded-full m-1"></div>
+                    </div>
+                    
+                    <div class="text-center border-t border-slate-400 pt-2 w-40">
+                        <p class="text-2xl font-bold text-slate-800 font-signature leading-none">HWPL</p>
+                        <p class="text-[10px] text-slate-500 uppercase mt-2 tracking-wider">Signature</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script> 
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynymQgGAZ-LMwcIUXgosBonlPkAasmqv6sPWDp-Qg0sxND_wig7qL4BuBiM4xCYcny5w/exec';
 
@@ -1082,21 +1174,18 @@ function doGet(e) {
             }
         });
 
+        // 초기 목업 데이터 (출석 4번을 만족하는 테스트용 유저 추가)
         let appData = {
             attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', session: 'Aug 8 (Sat) - Session 1 (OT)', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8 (Sat) - Session 1 (OT)', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Kwame Mensah', country: 'South Africa', school: 'Cape Town Peace High', position: 'School Administrator', year: '2026', session: 'Aug 15 (Sat) - Session 2', timestamp: getFormattedEnglishTimestamp() }
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 1', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 2', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 3', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 4', timestamp: getFormattedEnglishTimestamp() },
+                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8', timestamp: getFormattedEnglishTimestamp() }
             ])),
-            missions: JSON.parse(localStorage.getItem('hwpl_missions') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher / Educator', year: '2026', week: 'Session 1 Mission (Aug 8)', date: '2026-08-10', target: 'school/students', count: '28', content: '- Subject: Fostering Empathy\n- Activity: Small group dialogue on conflict resolution\n- Reflection: Students engaged actively and shared personal insights.', reflection: 'Target: school/students (28 participants) | Date: 2026-08-10 | At least 3 photos sent to coordinator', photo: '', timestamp: getFormattedEnglishTimestamp() }
-            ])),
-            qna: JSON.parse(localStorage.getItem('hwpl_qna') || JSON.stringify([
-                { name: 'Kwame Mensah', country: 'South Africa', content: 'How can we adapt Lesson 3 for high school students?', timestamp: getFormattedEnglishTimestamp(), replies: [{ name: 'Admin', content: 'You can incorporate role-playing and collaborative conflict resolution discussions.', timestamp: getFormattedEnglishTimestamp() }] }
-            ])),
-            peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || JSON.stringify([
-                { name: 'Jean Dupont', country: 'France', content: 'Wishing all educators around the world great success in spreading the culture of peace!', timestamp: getFormattedEnglishTimestamp() }
-            ]))
+            missions: JSON.parse(localStorage.getItem('hwpl_missions') || '[]'),
+            qna: JSON.parse(localStorage.getItem('hwpl_qna') || '[]'),
+            peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || '[]')
         };
 
         let currentAdminTab = 'attendance';
@@ -1126,20 +1215,8 @@ function doGet(e) {
                             fetchedMissions.push(item);
                         } else if (item.type === 'qna') {
                             let replies = [];
-                            try {
-                                if (item.reflection) {
-                                    replies = JSON.parse(item.reflection);
-                                }
-                            } catch (e) {
-                                replies = [];
-                            }
-                            fetchedQna.push({
-                                name: item.name,
-                                country: item.country,
-                                content: item.content,
-                                timestamp: item.timestamp,
-                                replies: replies
-                            });
+                            try { if (item.reflection) replies = JSON.parse(item.reflection); } catch (e) {}
+                            fetchedQna.push({ name: item.name, country: item.country, content: item.content, timestamp: item.timestamp, replies: replies });
                         } else if (item.type === 'peaceMsg') {
                             fetchedPeaceMsg.push(item);
                         }
@@ -1300,26 +1377,16 @@ function doGet(e) {
 
         async function handleVideoAttendanceSubmit(event) {
             event.preventDefault();
-            const name = document.getElementById('vidAttName').value.trim();
-            const country = document.getElementById('vidAttCountry').value;
-            const school = document.getElementById('vidAttSchool').value.trim();
-            const position = document.getElementById('vidAttPosition').value;
-            const year = document.getElementById('vidAttYear').value;
-            const session = document.getElementById('vidAttSession').value;
-            const partType = document.getElementById('vidAttType').value;
-            const content = document.getElementById('vidAttContent').value.trim();
-            const timestamp = getFormattedEnglishTimestamp();
-
             const attendancePayload = {
                 type: 'attendance',
-                name: name,
-                country: country,
-                school: school,
-                position: position,
-                year: year,
-                session: `${session} (${partType})`,
-                timestamp: timestamp,
-                reflection: content
+                name: document.getElementById('vidAttName').value.trim(),
+                country: document.getElementById('vidAttCountry').value,
+                school: document.getElementById('vidAttSchool').value.trim(),
+                position: document.getElementById('vidAttPosition').value,
+                year: document.getElementById('vidAttYear').value,
+                session: `${document.getElementById('vidAttSession').value} (${document.getElementById('vidAttType').value})`,
+                timestamp: getFormattedEnglishTimestamp(),
+                reflection: document.getElementById('vidAttContent').value.trim()
             };
 
             const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -1353,7 +1420,7 @@ function doGet(e) {
                 target: document.getElementById('missionTarget').value,
                 count: document.getElementById('missionCount').value,
                 content: document.getElementById('missionContent').value.trim(),
-                reflection: `Target: ${document.getElementById('missionTarget').value} (${document.getElementById('missionCount').value} participants) | Date: ${document.getElementById('missionDate').value} | At least 3 photos sent to group chat / coordinator`,
+                reflection: `Target: ${document.getElementById('missionTarget').value} (${document.getElementById('missionCount').value} participants) | Date: ${document.getElementById('missionDate').value}`,
                 photo: '',
                 timestamp: getFormattedEnglishTimestamp()
             };
@@ -1373,6 +1440,172 @@ function doGet(e) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
             }
+        }
+
+        // ============================================
+        // 수료증(Certificate) 로직 추가 영역
+        // ============================================
+
+        async function handleCertCheck(e) {
+            e.preventDefault();
+            const name = document.getElementById('certName').value.trim();
+            const country = document.getElementById('certCountry').value;
+            const school = document.getElementById('certSchool').value.trim();
+            
+            // 이름과 학교명을 소문자로 변환하여 부분 일치 확인 (유연한 검색)
+            const userAtt = appData.attendance.filter(a => 
+                a.name.toLowerCase() === name.toLowerCase() && 
+                a.country === country && 
+                (a.school || '').toLowerCase().includes(school.toLowerCase())
+            );
+            
+            const container = document.getElementById('certResultContainer');
+            container.classList.remove('hidden');
+            
+            if (userAtt.length >= 4) {
+                // 발급 조건 충족 (4회 이상 출석)
+                
+                // 이름과 학교 내보내기용 텍스트 안전 처리
+                const safeName = userAtt[0].name.replace(/'/g, "\\'");
+                const safeSchool = userAtt[0].school.replace(/'/g, "\\'");
+                
+                // 성공 UI 렌더링
+                container.innerHTML = `
+                    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h4 class="text-emerald-900 font-bold text-base flex items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Congratulations!
+                            </h4>
+                            <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
+                                You have actively and faithfully participated in the sessions.<br>
+                                So, you are officially eligible for the Certificate of Completion.
+                            </p>
+                        </div>
+                        <button onclick="downloadCertificate('${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
+                            <i class="fa-solid fa-file-pdf"></i> Download Certificate
+                        </button>
+                    </div>
+                `;
+            } else {
+                // 발급 조건 미충족
+                container.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl">
+                        <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible Yet
+                        </h4>
+                        <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
+                            You currently have <strong>${userAtt.length}</strong> attendance record(s) registered under this name and school. You need at least <strong>4 records</strong> to generate the certificate.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // [가장 확실한 정석 해결책: 같은 서버(도메인)에 이미지 올리기]
+        // Imgur 등 외부 사이트 링크는 브라우저 보안(CORS) 정책에 의해 PDF 변환이 100% 차단됩니다.
+        // 해결방법: 업로드해주신 Certificate_PE.png 이미지를 index.html 파일이 있는 
+        // 홈페이지 서버와 '똑같은 폴더(위치)'에 업로드하세요.
+        // 만약 워드프레스/아임웹 등을 사용 중이라면, 미디어 라이브러리에 업로드 후 
+        // 해당 '내 사이트 주소'로 시작하는 링크를 아래에 넣으시면 됩니다.
+        const PERMANENT_CERT_BG_URL = "./Certificate_PE.png";
+
+        async function downloadCertificate(name, school) {
+            showToast('Generating high-quality PDF. Please wait...', 'success');
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                
+                // A4 가로 사이즈 (297 x 210 mm)
+                const doc = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // 1. 수료증 배경 이미지 삽입 (같은 도메인의 이미지 사용)
+                const img = new Image();
+                
+                // 외부 링크일 경우만 crossOrigin 설정 (같은 도메인이면 불필요)
+                if (PERMANENT_CERT_BG_URL.startsWith('http') && !PERMANENT_CERT_BG_URL.includes(window.location.hostname)) {
+                    img.crossOrigin = "Anonymous";
+                }
+                
+                img.src = PERMANENT_CERT_BG_URL;
+                
+                img.onload = function() {
+                    try {
+                        // 이미지가 성공적으로 로드되면 배경으로 꽉 채워 그림
+                        doc.addImage(img, 'PNG', 0, 0, 297, 210);
+
+                        // 2. 동적 텍스트 (이름, 학교명) 삽입
+                        // [이름 출력]
+                        doc.setTextColor(15, 23, 42); // 글씨 색상 (진남색)
+                        doc.setFont("times", "bold"); // 폰트: 세리프 폰트 적용
+                        doc.setFontSize(40); 
+                        doc.text(name, 148.5, 103, { align: "center" }); // Y축 103mm (빈칸 선 바로 위)
+                        
+                        // [학교/소속 출력]
+                        doc.setTextColor(71, 85, 105); // 글씨 색상 (회색)
+                        doc.setFont("helvetica", "italic");
+                        doc.setFontSize(18);
+                        doc.text(school, 148.5, 115, { align: "center" }); // Y축 115mm (선 바로 아래)
+
+                        // PDF 자동 다운로드 실행
+                        const safeFileName = name.replace(/[^a-zA-Z0-9가-힣]/g, '_');
+                        doc.save(`HWPL_Certificate_${safeFileName}.pdf`);
+                        
+                        showToast('Certificate downloaded successfully!', 'success');
+                    } catch (err) {
+                        console.error('Canvas Tainted or PDF Error:', err);
+                        showToast('보안 에러: 이미지가 홈페이지 서버와 같은 곳에 있지 않습니다.', 'error');
+                    }
+                };
+
+                img.onerror = function() {
+                    console.error('Error loading background image.');
+                    showToast('이미지 로드 실패: Certificate_PE.png 파일이 같은 폴더에 있는지 확인하세요.', 'error');
+                };
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showToast('An error occurred while generating the certificate.', 'error');
+            }
+        }
+
+        // ============================================
+
+        function handleMyRecordLookup(e) {
+            e.preventDefault();
+            const name = document.getElementById('lookupName').value.trim().toLowerCase();
+            const country = document.getElementById('lookupCountry').value;
+            const school = document.getElementById('lookupSchool').value.trim().toLowerCase();
+
+            const userAtt = appData.attendance.filter(a => a.name.toLowerCase() === name && a.country === country && (a.school || '').toLowerCase().includes(school));
+            const userMis = appData.missions.filter(m => m.name.toLowerCase() === name && m.country === country && (m.school || '').toLowerCase().includes(school));
+
+            document.getElementById('lookupResultName').textContent = document.getElementById('lookupName').value.trim() + ` (${country}, ${document.getElementById('lookupSchool').value.trim()})`;
+            document.getElementById('lookupAttCount').textContent = userAtt.length;
+            document.getElementById('lookupMisCount').textContent = userMis.length;
+
+            const attList = document.getElementById('lookupAttList');
+            attList.innerHTML = userAtt.length ? userAtt.map(a => `
+                <div class="bg-white p-2 rounded-lg border border-teal-200 flex justify-between items-center">
+                    <div><strong>${a.session}</strong><br/><span class="text-[10px] text-slate-400">${a.school || ''} • ${a.timestamp}</span></div>
+                    <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold text-[10px]">Attended</span>
+                </div>
+            `).join('') : `<p class="text-slate-400 italic">No attendance records found.</p>`;
+
+            const misList = document.getElementById('lookupMisList');
+            misList.innerHTML = userMis.length ? userMis.map(m => `
+                <div class="bg-white p-2 rounded-lg border border-amber-200 space-y-1">
+                    <div class="flex justify-between"><strong>${m.week}</strong><span class="text-[10px] text-slate-400">${m.timestamp}</span></div>
+                    <p class="text-slate-600 text-[11px] whitespace-pre-line">${m.content}</p>
+                    ${m.target ? `<span class="inline-block bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded">Target: ${m.target} (${m.count || 'N/A'} people)</span>` : ''}
+                </div>
+            `).join('') : `<p class="text-slate-400 italic">No mission submissions found.</p>`;
+
+            document.getElementById('lookupResultContainer').classList.remove('hidden');
+            showToast('Records retrieved successfully!', 'success');
         }
 
         async function handleQnaSubmit(e) {
@@ -1402,15 +1635,9 @@ function doGet(e) {
                 return;
             }
 
-            const replyItem = {
-                name: 'Admin',
-                content: contentInput.value.trim(),
-                timestamp: getFormattedEnglishTimestamp()
-            };
+            const replyItem = { name: 'Admin', content: contentInput.value.trim(), timestamp: getFormattedEnglishTimestamp() };
 
-            if (!appData.qna[qIndex].replies) {
-                appData.qna[qIndex].replies = [];
-            }
+            if (!appData.qna[qIndex].replies) appData.qna[qIndex].replies = [];
             appData.qna[qIndex].replies.push(replyItem);
             saveToLocalStorage();
 
@@ -1503,40 +1730,6 @@ function doGet(e) {
                     <p class="text-emerald-950 leading-relaxed">${m.content}</p>
                 </div>
             `).join('');
-        }
-
-        function handleMyRecordLookup(e) {
-            e.preventDefault();
-            const name = document.getElementById('lookupName').value.trim().toLowerCase();
-            const country = document.getElementById('lookupCountry').value;
-            const school = document.getElementById('lookupSchool').value.trim().toLowerCase();
-
-            const userAtt = appData.attendance.filter(a => a.name.toLowerCase() === name && a.country === country && (a.school || '').toLowerCase().includes(school));
-            const userMis = appData.missions.filter(m => m.name.toLowerCase() === name && m.country === country && (m.school || '').toLowerCase().includes(school));
-
-            document.getElementById('lookupResultName').textContent = document.getElementById('lookupName').value.trim() + ` (${country}, ${document.getElementById('lookupSchool').value.trim()})`;
-            document.getElementById('lookupAttCount').textContent = userAtt.length;
-            document.getElementById('lookupMisCount').textContent = userMis.length;
-
-            const attList = document.getElementById('lookupAttList');
-            attList.innerHTML = userAtt.length ? userAtt.map(a => `
-                <div class="bg-white p-2 rounded-lg border border-teal-200 flex justify-between items-center">
-                    <div><strong>${a.session}</strong><br/><span class="text-[10px] text-slate-400">${a.school || ''} • ${a.timestamp}</span></div>
-                    <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold text-[10px]">Attended</span>
-                </div>
-            `).join('') : `<p class="text-slate-400 italic">No attendance records found.</p>`;
-
-            const misList = document.getElementById('lookupMisList');
-            misList.innerHTML = userMis.length ? userMis.map(m => `
-                <div class="bg-white p-2 rounded-lg border border-amber-200 space-y-1">
-                    <div class="flex justify-between"><strong>${m.week}</strong><span class="text-[10px] text-slate-400">${m.timestamp}</span></div>
-                    <p class="text-slate-600 text-[11px] whitespace-pre-line">${m.content}</p>
-                    ${m.target ? `<span class="inline-block bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded">Target: ${m.target} (${m.count || 'N/A'} people)</span>` : ''}
-                </div>
-            `).join('') : `<p class="text-slate-400 italic">No mission submissions found.</p>`;
-
-            document.getElementById('lookupResultContainer').classList.remove('hidden');
-            showToast('Records retrieved successfully!', 'success');
         }
 
         function renderAdminDashboard() {
@@ -1773,6 +1966,7 @@ function doGet(e) {
         window.onload = async function() {
             renderQnaList();
             renderPeaceMsgList();
+            
             await fetchGoogleSheetData();
         };
     </script>
