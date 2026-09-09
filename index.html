@@ -1534,8 +1534,26 @@ function doGet(e) {
                 
                 img.onload = function() {
                     try {
-                        // 이미지가 성공적으로 로드되면 배경으로 꽉 채워 그림
-                        doc.addImage(img, 'PNG', 0, 0, 297, 210);
+                        // [핵심 수정 사항] 
+                        // PNG 파일의 투명 배경이 검게 변하거나 이미지가 깨지는 현상을 완벽 방지하기 위해,
+                        // 캔버스를 사용하여 흰색 배경을 깐 고화질 JPEG 이미지로 안전하게 변환합니다.
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // 배경을 강제로 흰색으로 채움 (투명도 오류 방지)
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        // 그 위에 원본 이미지 렌더링
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // 최고 화질(1.0)의 JPEG 데이터로 변환
+                        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+                        // 변환된 안전하고 깨끗한 이미지를 배경으로 꽉 채워 그림
+                        doc.addImage(imgData, 'JPEG', 0, 0, 297, 210);
 
                         // 2. 동적 텍스트 (이름, 학교명) 삽입
                         // [이름 출력]
