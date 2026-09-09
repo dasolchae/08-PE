@@ -1501,13 +1501,8 @@ function doGet(e) {
             }
         }
 
-        // [가장 확실한 정석 해결책: 같은 서버(도메인)에 이미지 올리기]
-        // Imgur 등 외부 사이트 링크는 브라우저 보안(CORS) 정책에 의해 PDF 변환이 100% 차단됩니다.
-        // 해결방법: 업로드해주신 Certificate_PE.png 이미지를 index.html 파일이 있는 
-        // 홈페이지 서버와 '똑같은 폴더(위치)'에 업로드하세요.
-        // 만약 워드프레스/아임웹 등을 사용 중이라면, 미디어 라이브러리에 업로드 후 
-        // 해당 '내 사이트 주소'로 시작하는 링크를 아래에 넣으시면 됩니다.
-        const PERMANENT_CERT_BG_URL = "./Certificate_PE.png";
+        // [수정] 상대 경로 인식을 명확히 하기 위해 "./"를 제거하고 파일명만 입력합니다.
+        const PERMANENT_CERT_BG_URL = "Certificate_PE.png";
 
         async function downloadCertificate(name, school) {
             showToast('Generating high-quality PDF. Please wait...', 'success');
@@ -1522,24 +1517,20 @@ function doGet(e) {
                     format: 'a4'
                 });
                 
-                // 1. 수료증 배경 이미지 삽입 (같은 도메인의 이미지 사용)
                 const img = new Image();
+                img.crossOrigin = "Anonymous"; // GitHub 보안 우회
                 
-                // 외부 링크일 경우만 crossOrigin 설정 (같은 도메인이면 불필요)
-                if (PERMANENT_CERT_BG_URL.startsWith('http') && !PERMANENT_CERT_BG_URL.includes(window.location.hostname)) {
-                    img.crossOrigin = "Anonymous";
-                }
-                
-                img.src = PERMANENT_CERT_BG_URL;
+                // 브라우저가 옛날 파일(하얀 배경)을 기억하고 있는 것을 방지하기 위해 꼬리표(시간)를 붙임
+                img.src = PERMANENT_CERT_BG_URL + "?t=" + new Date().getTime();
                 
                 img.onload = function() {
                     try {
-                        // [핵심 수정 사항] 
-                        // PNG 파일의 투명 배경이 검게 변하거나 이미지가 깨지는 현상을 완벽 방지하기 위해,
-                        // 캔버스를 사용하여 흰색 배경을 깐 고화질 JPEG 이미지로 안전하게 변환합니다.
                         const canvas = document.createElement('canvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
+                        
+                        // [핵심 해결] 브라우저 화면에 보이지 않는 메모리 상의 이미지 크기를 가져올 때는 
+                        // 반드시 'naturalWidth/naturalHeight'를 써야 하얗게 나오는 것을 방지할 수 있습니다.
+                        canvas.width = img.naturalWidth || 2000;
+                        canvas.height = img.naturalHeight || 1414;
                         const ctx = canvas.getContext('2d');
                         
                         // 배경을 강제로 흰색으로 채움 (투명도 오류 방지)
