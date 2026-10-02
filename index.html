@@ -12,7 +12,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- 추가된 구글 폰트: 우아한 명조체(Playfair Display) 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- 추가된 라이브러리: jsPDF (단독으로 사용하여 PDF 렌더링 에러 해결) -->
@@ -25,6 +27,7 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'], // 메인 슬로건용 폰트
                         signature: ['"Brush Script MT"', 'cursive'] // 수료증 서명용 폰트
                     },
                     colors: {
@@ -42,6 +45,17 @@
                             950: '#0f2928'
                         },
                         tape: '#f5e5a3'
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
                     }
                 }
             }
@@ -64,6 +78,15 @@
 
         .poster-card-shadow {
             box-shadow: 0 10px 25px -5px rgba(39, 117, 114, 0.15), 0 8px 10px -6px rgba(39, 117, 114, 0.1);
+        }
+        
+        .peacetown-banner {
+            background-color: #e6f4f1; /* Soft teal background */
+            /* 은은한 청록색 그라데이션 필터를 입혀 마을 이미지의 하늘과 자연스럽게 블렌딩되도록 처리 */
+            background-image: linear-gradient(to bottom, rgba(230, 244, 241, 0.95) 0%, rgba(230, 244, 241, 0.4) 45%, transparent 100%), url('image_12a296.jpg'); 
+            background-size: cover;
+            background-position: bottom center;
+            background-repeat: no-repeat;
         }
 
         .chart-container {
@@ -90,13 +113,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #33928e;
         }
+        
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
     </style>
 </head>
 <body class="bg-slate-50 doodle-bg font-sans text-slate-800 min-h-screen flex flex-col">
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-5 transform transition-all">
             <div>
                 <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Restricted Access</span>
@@ -205,7 +232,7 @@ function doGet(e) {
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="bg-teal-100 text-teal-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider">HWPL 08</span>
-                        <h1 class="font-display font-extrabold text-teal-900 text-base md:text-lg leading-none">HWPL 08 PEACE EDUCATION TRAINING</h1>
+                        <h1 class="font-display font-extrabold text-teal-900 text-base md:text-lg leading-none">HWPL 08 PEACE EDUCATION</h1>
                     </div>
                     <p class="text-xs text-teal-600 font-medium mt-0.5">Peace Educator Portal & Administration</p>
                 </div>
@@ -226,50 +253,33 @@ function doGet(e) {
 
         <div id="studentView" class="space-y-8">
             
-            <div class="bg-white rounded-3xl p-6 md:p-8 border border-teal-100 poster-card-shadow relative overflow-hidden">
-                <div class="absolute -right-6 -bottom-6 text-teal-100 opacity-60 pointer-events-none">
-                    <i class="fa-solid fa-paper-plane text-[160px] transform -rotate-12"></i>
-                </div>
-                <div class="absolute right-1/3 top-2 text-teal-100 opacity-40 pointer-events-none">
-                    <i class="fa-solid fa-lightbulb text-7xl"></i>
-                </div>
-
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                    <div class="lg:col-span-8 space-y-3">
-                        <div class="flex flex-wrap items-center gap-3">
-                            <span class="tape-badge font-display font-extrabold text-xs text-amber-900 px-3 py-1 rounded-sm uppercase tracking-wider">
-                                Peace Education
-                            </span>
-                            <span class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 flex items-center gap-1.5">
-                                <i class="fa-solid fa-star text-amber-400"></i> 2026 2nd HWPL PEACE EDUCATION
-                            </span>
-                        </div>
-
-                        <h2 class="text-2xl md:text-4xl font-display font-black text-teal-900 tracking-tight leading-tight">
-                            2026 2nd HWPL PEACE EDUCATION<br class="hidden sm:inline"/> TRAINING
-                        </h2>
-
-                        <p class="text-teal-700 text-xs md:text-sm leading-relaxed max-w-2xl font-medium">
-                            Join HWPL's Peace Education Training! HWPL Peace Education Training educates teachers on HWPL peace textbook 12 lessons so that students can learn the value of peace through peace educators.
-                        </p>
+            <!-- Completely redesigned Peacetown Banner using the reference image as a background -->
+            <div class="peacetown-banner rounded-3xl pt-5 pb-16 px-6 md:px-10 border border-teal-200 shadow-md relative overflow-hidden flex flex-col items-center justify-start text-center h-auto min-h-[250px] md:min-h-[280px]">
+                
+                <!-- Center aligned text content, pushed slightly up to clear the village -->
+                <div class="relative z-30 flex flex-col justify-center items-center w-full max-w-3xl space-y-3 bg-white/75 backdrop-blur-sm p-5 md:p-6 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(39,117,114,0.08)] mt-0">
+                    
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="bg-teal-100 text-teal-900 text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border border-teal-200">
+                            HWPL Peace Education
+                        </span>
                     </div>
 
-                    <div class="lg:col-span-4 bg-teal-600 text-white p-5 rounded-2xl shadow-lg border-2 border-teal-500 flex flex-col justify-center items-center text-center space-y-2 relative transform hover:scale-[1.02] transition-transform">
-                        <div class="absolute -top-3 bg-tape text-teal-950 font-black text-[11px] px-3 py-0.5 rounded shadow-sm uppercase tracking-wider">
-                            SCHEDULE & TIME
-                        </div>
-                        <div class="text-xl font-display font-black text-emerald-300 tracking-wide mt-1">
-                            AUG 8 – SEPT 5
-                        </div>
-                        <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-400/60 pb-2 w-full">
-                            EVERY SATURDAY
-                        </div>
-                        <div class="pt-1 text-xs space-y-0.5 font-semibold text-teal-50">
-                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30 AM</p>
-                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 2:30 PM</p>
-                        </div>
+                    <h2 class="font-serif italic text-3xl md:text-4xl lg:text-5xl text-teal-950 leading-tight drop-shadow-sm font-bold">
+                        Peace begins with me.
+                    </h2>
+
+                    <p class="text-teal-900 text-sm leading-relaxed max-w-xl font-medium mt-1">
+                        Join a global movement to foster a culture of peace through innovative education. Explore 12 essential lessons, empower future generations, and discover that lasting harmony starts from within.
+                    </p>
+
+                    <div class="pt-2">
+                        <a href="#pastRecordings" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs md:text-sm px-6 py-3 rounded-full shadow-lg transition-all items-center gap-2 transform hover:-translate-y-1 uppercase tracking-wider">
+                            <i class="fa-solid fa-circle-play text-teal-200"></i> Review Past Sessions
+                        </a>
                     </div>
                 </div>
+
             </div>
 
             <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-teal-200 shadow-md space-y-5">
@@ -365,7 +375,7 @@ function doGet(e) {
                 </form>
             </section>
 
-            <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-indigo-200 shadow-md space-y-6">
+            <section id="pastRecordings" class="bg-white rounded-3xl p-6 md:p-8 border-2 border-indigo-200 shadow-md space-y-6">
                 <div class="flex items-center gap-3 border-b border-indigo-100 pb-4">
                     <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
                         <i class="fa-solid fa-video"></i>
@@ -1174,7 +1184,7 @@ function doGet(e) {
             }
         });
 
-        // 초기 목업 데이터 (출석 4번을 만족하는 테스트용 유저 추가)
+        // 초기 목업 데이터
         let appData = {
             attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
                 { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 1', timestamp: getFormattedEnglishTimestamp() },
@@ -1442,17 +1452,12 @@ function doGet(e) {
             }
         }
 
-        // ============================================
-        // 수료증(Certificate) 로직 추가 영역
-        // ============================================
-
         async function handleCertCheck(e) {
             e.preventDefault();
             const name = document.getElementById('certName').value.trim();
             const country = document.getElementById('certCountry').value;
             const school = document.getElementById('certSchool').value.trim();
             
-            // 이름과 학교명을 소문자로 변환하여 부분 일치 확인 (유연한 검색)
             const userAtt = appData.attendance.filter(a => 
                 a.name.toLowerCase() === name.toLowerCase() && 
                 a.country === country && 
@@ -1463,13 +1468,9 @@ function doGet(e) {
             container.classList.remove('hidden');
             
             if (userAtt.length >= 4) {
-                // 발급 조건 충족 (4회 이상 출석)
-                
-                // 이름과 학교 내보내기용 텍스트 안전 처리
                 const safeName = userAtt[0].name.replace(/'/g, "\\'");
                 const safeSchool = userAtt[0].school.replace(/'/g, "\\'");
                 
-                // 성공 UI 렌더링
                 container.innerHTML = `
                     <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
                         <div>
@@ -1487,7 +1488,6 @@ function doGet(e) {
                     </div>
                 `;
             } else {
-                // 발급 조건 미충족
                 container.innerHTML = `
                     <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl">
                         <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
@@ -1501,7 +1501,6 @@ function doGet(e) {
             }
         }
 
-        // [수정] 상대 경로 인식을 명확히 하기 위해 "./"를 제거하고 파일명만 입력합니다.
         const PERMANENT_CERT_BG_URL = "Certificate_PE.png";
 
         async function downloadCertificate(name, school) {
@@ -1509,57 +1508,36 @@ function doGet(e) {
             
             try {
                 const { jsPDF } = window.jspdf;
-                
-                // A4 가로 사이즈 (297 x 210 mm)
-                const doc = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm',
-                    format: 'a4'
-                });
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 
                 const img = new Image();
-                img.crossOrigin = "Anonymous"; // GitHub 보안 우회
-                
-                // 브라우저가 옛날 파일(하얀 배경)을 기억하고 있는 것을 방지하기 위해 꼬리표(시간)를 붙임
+                img.crossOrigin = "Anonymous"; 
                 img.src = PERMANENT_CERT_BG_URL + "?t=" + new Date().getTime();
                 
                 img.onload = function() {
                     try {
                         const canvas = document.createElement('canvas');
-                        
-                        // [핵심 해결] 브라우저 화면에 보이지 않는 메모리 상의 이미지 크기를 가져올 때는 
-                        // 반드시 'naturalWidth/naturalHeight'를 써야 하얗게 나오는 것을 방지할 수 있습니다.
                         canvas.width = img.naturalWidth || 2000;
                         canvas.height = img.naturalHeight || 1414;
                         const ctx = canvas.getContext('2d');
                         
-                        // 배경을 강제로 흰색으로 채움 (투명도 오류 방지)
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        
-                        // 그 위에 원본 이미지 렌더링
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        // 최고 화질(1.0)의 JPEG 데이터로 변환
                         const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
-                        // 변환된 안전하고 깨끗한 이미지를 배경으로 꽉 채워 그림
                         doc.addImage(imgData, 'JPEG', 0, 0, 297, 210);
 
-                        // 2. 동적 텍스트 (이름, 학교명) 삽입
-                        // [이름 출력]
-                        doc.setTextColor(15, 23, 42); // 글씨 색상 (진남색)
-                        doc.setFont("times", "bold"); // 폰트: 세리프 폰트 적용
+                        doc.setTextColor(15, 23, 42); 
+                        doc.setFont("times", "bold"); 
                         doc.setFontSize(40); 
-                        doc.text(name, 148.5, 103, { align: "center" }); // Y축 103mm (빈칸 선 바로 위)
+                        doc.text(name, 148.5, 103, { align: "center" }); 
                         
-                        // [학교/소속 출력]
-                        doc.setTextColor(71, 85, 105); // 글씨 색상 (회색)
+                        doc.setTextColor(71, 85, 105); 
                         doc.setFont("helvetica", "italic");
                         doc.setFontSize(18);
-                        doc.text(school, 148.5, 115, { align: "center" }); // Y축 115mm (선 바로 아래)
+                        doc.text(school, 148.5, 115, { align: "center" }); 
 
-                        // PDF 자동 다운로드 실행
                         const safeFileName = name.replace(/[^a-zA-Z0-9가-힣]/g, '_');
                         doc.save(`HWPL_Certificate_${safeFileName}.pdf`);
                         
@@ -1580,8 +1558,6 @@ function doGet(e) {
                 showToast('An error occurred while generating the certificate.', 'error');
             }
         }
-
-        // ============================================
 
         function handleMyRecordLookup(e) {
             e.preventDefault();
