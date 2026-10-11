@@ -359,11 +359,12 @@ function doGet(e) {
                         <label class="block text-xs font-bold text-slate-700 mb-1">6. Session <span class="text-rose-500">*</span></label>
                         <select id="attSession" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
                             <option value="" disabled selected>Select Session...</option>
-                            <option value="Aug 8 (Sat) - Session 1 (OT)">Aug 8 (Sat) - Session 1 (OT)</option>
-                            <option value="Aug 15 (Sat) - Session 2">Aug 15 (Sat) - Session 2</option>
-                            <option value="Aug 22 (Sat) - Session 3">Aug 22 (Sat) - Session 3</option>
-                            <option value="Aug 29 (Sat) - Session 4">Aug 29 (Sat) - Session 4</option>
-                            <option value="Sept 5 (Sat) - Session 5">Sept 5 (Sat) - Session 5</option>
+                            <option value="Nov 7 (Sat) - Session 1">Nov 7 (Sat) - Session 1</option>
+                            <option value="Nov 14 (Sat) - Session 2">Nov 14 (Sat) - Session 2</option>
+                            <option value="Nov 21 (Sat) - Session 3">Nov 21 (Sat) - Session 3</option>
+                            <option value="Nov 28 (Sat) - Session 4">Nov 28 (Sat) - Session 4</option>
+                            <option value="Dec 5 (Sat) - Session 5">Dec 5 (Sat) - Session 5</option>
+                            <option value="Dec 12 (Sat) - Townhall">Dec 12 (Sat) - Townhall</option>
                         </select>
                     </div>
 
@@ -394,70 +395,84 @@ function doGet(e) {
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 1</span>
-                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 8</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Nov 7</span>
                             </div>
                             <h4 class="font-display font-bold text-sm">Orientation & Core Values</h4>
                             <p class="text-[11px] text-slate-300">HWPL Peace Education 12 Lessons Overview</p>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=ajTnVzwP71k" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
-                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
-                        </a>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
                     </div>
 
                     <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 2</span>
-                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 15</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Nov 14</span>
                             </div>
                             <h4 class="font-display font-bold text-sm">Lessons 1 ~ 2</h4>
                             <p class="text-[11px] text-slate-300">All Creation Living in Harmony</p>
                         </div>
-                        <a href="https://youtu.be/m-aRpq51xcU" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
-                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
-                        </a>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
                     </div>
 
                     <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 3</span>
-                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 22</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Nov 21</span>
                             </div>
                             <h4 class="font-display font-bold text-sm">Lessons 3 ~ 4</h4>
                             <p class="text-[11px] text-slate-300">What Broke Peace & Restoration of Order</p>
                         </div>
-                        <a href="https://youtu.be/9MJp4tOvLLc" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
-                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
-                        </a>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
                     </div>
 
                     <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 4</span>
-                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Aug 29</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Nov 28</span>
                             </div>
                             <h4 class="font-display font-bold text-sm">Lessons 5 ~ 8</h4>
                             <p class="text-[11px] text-slate-300">Gratitude, Consideration, Sacrifice, Forgiveness </p>
                         </div>
-                        <a href="https://youtu.be/JpLp9_swefA" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
-                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
-                        </a>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
                     </div>
 
                     <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center">
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Session 5</span>
-                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Sep 5</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Dec 5</span>
                             </div>
                             <h4 class="font-display font-bold text-sm">Lessons 9 ~ 12</h4>
-                            <p class="text-[11px] text-slate-300">Respect, Heritage, Law-Abiding Spirit, messenger of peace </p>
+                            <p class="text-[11px] text-slate-300">Respect, Heritage, Law-Abiding Spirit, Messenger of Peace </p>
                         </div>
-                        <a href="https://youtu.be/IGi-4Hf9bdU" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow">
-                            <i class="fa-solid fa-external-link-alt"></i> Open Recording Link
-                        </a>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-indigo-900">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Townhall</span>
+                                <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Dec 12</span>
+                            </div>
+                            <h4 class="font-display font-bold text-sm">HWPL Peace Educators' Gathering</h4>
+                            <p class="text-[11px] text-slate-300">Sharing Reflections & Commitments</p>
+                        </div>
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        </button>
                     </div>
                 </div>
 
@@ -532,11 +547,12 @@ function doGet(e) {
                             <label class="block text-xs font-bold text-slate-700 mb-1">6. Target Session <span class="text-rose-500">*</span></label>
                             <select id="vidAttSession" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                 <option value="" disabled selected>Select Session...</option>
-                                <option value="Aug 8 (Sat) - Session 1 (OT)">Aug 8 (Sat) - Session 1 (OT)</option>
-                                <option value="Aug 15 (Sat) - Session 2">Aug 15 (Sat) - Session 2</option>
-                                <option value="Aug 22 (Sat) - Session 3">Aug 22 (Sat) - Session 3</option>
-                                <option value="Aug 29 (Sat) - Session 4">Aug 29 (Sat) - Session 4</option>
-                                <option value="Sept 5 (Sat) - Session 5">Sept 5 (Sat) - Session 5</option>
+                                <option value="Nov 7 (Sat) - Session 1">Nov 7 (Sat) - Session 1</option>
+                                <option value="Nov 14 (Sat) - Session 2">Nov 14 (Sat) - Session 2</option>
+                                <option value="Nov 21 (Sat) - Session 3">Nov 21 (Sat) - Session 3</option>
+                                <option value="Nov 28 (Sat) - Session 4">Nov 28 (Sat) - Session 4</option>
+                                <option value="Dec 5 (Sat) - Session 5">Dec 5 (Sat) - Session 5</option>
+                                <option value="Dec 12 (Sat) - Townhall">Dec 12 (Sat) - Townhall</option>
                             </select>
                         </div>
 
@@ -640,11 +656,12 @@ function doGet(e) {
                         <label class="block text-xs font-bold text-slate-700 mb-1">6. Target Mission <span class="text-rose-500">*</span></label>
                         <select id="missionWeek" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
                             <option value="" disabled selected>Select Mission...</option>
-                            <option value="Session 1 Mission (Aug 8)">Session 1 Mission (Aug 8)</option>
-                            <option value="Session 2 Mission (Aug 15)">Session 2 Mission (Aug 15)</option>
-                            <option value="Session 3 Mission (Aug 22)">Session 3 Mission (Aug 22)</option>
-                            <option value="Session 4 Mission (Aug 29)">Session 4 Mission (Aug 29)</option>
-                            <option value="Session 5 Mission (Sept 5)">Session 5 Mission (Sept 5)</option>
+                            <option value="Session 1 Mission (Nov 7)">Session 1 Mission (Nov 7)</option>
+                            <option value="Session 2 Mission (Nov 14)">Session 2 Mission (Nov 14)</option>
+                            <option value="Session 3 Mission (Nov 21)">Session 3 Mission (Nov 21)</option>
+                            <option value="Session 4 Mission (Nov 28)">Session 4 Mission (Nov 28)</option>
+                            <option value="Session 5 Mission (Dec 5)">Session 5 Mission (Dec 5)</option>
+                            <option value="Townhall Mission (Dec 12)">Townhall Mission (Dec 12)</option>
                         </select>
                     </div>
 
@@ -756,13 +773,8 @@ function doGet(e) {
                         <input type="text" id="lookupSchool" required placeholder="School / Organization" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
                         <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold py-2.5 rounded-xl">Lookup Records</button>
                     </form>
-                    <div id="lookupResultContainer" class="hidden pt-3 border-t border-slate-100 space-y-2 text-xs">
-                        <div class="flex justify-between font-bold text-teal-950">
-                            <span id="lookupResultName">Name</span>
-                            <span>Attended: <strong id="lookupAttCount">0</strong> | Missions: <strong id="lookupMisCount">0</strong></span>
-                        </div>
-                        <div id="lookupAttList" class="space-y-1 max-h-32 overflow-y-auto"></div>
-                        <div id="lookupMisList" class="space-y-1 max-h-32 overflow-y-auto"></div>
+                    <div id="lookupResultContainer" class="hidden pt-3 border-t border-slate-100 text-xs">
+                        <!-- 동적 조회 결과가 삽입됩니다 -->
                     </div>
                 </div>
 
@@ -955,16 +967,23 @@ function doGet(e) {
                         <button id="tabAttendanceBtn" onclick="switchAdminTab('attendance')" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all">Attendance Records</button>
                         <button id="tabMissionsBtn" onclick="switchAdminTab('missions')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Mission Submissions</button>
                     </div>
-                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <div class="w-full sm:w-36">
-                            <select id="adminYearFilter" onchange="filterAdminTable()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                        <div class="w-full sm:w-44">
+                            <select id="adminCohortFilter" onchange="renderAdminDashboard()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none font-bold text-teal-800">
+                                <option value="">All Cohorts (2nd & 3rd)</option>
+                                <option value="3rd Cohort (Nov-Dec)">3rd Cohort (Nov-Dec)</option>
+                                <option value="2nd Cohort (Aug-Sep)">2nd Cohort (Aug-Sep)</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-28">
+                            <select id="adminYearFilter" onchange="renderAdminDashboard()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
                                 <option value="">All Years</option>
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
                                 <option value="2028">2028</option>
                             </select>
                         </div>
-                        <div class="w-full sm:w-44">
+                        <div class="w-full sm:w-36">
                             <select id="adminSessionFilter" onchange="filterAdminTable()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
                                 <option value="">All Sessions</option>
                                 <option value="Session 1">Session 1</option>
@@ -972,6 +991,7 @@ function doGet(e) {
                                 <option value="Session 3">Session 3</option>
                                 <option value="Session 4">Session 4</option>
                                 <option value="Session 5">Session 5</option>
+                                <option value="Townhall">Townhall</option>
                             </select>
                         </div>
                         <div class="w-full sm:w-56">
@@ -1431,7 +1451,6 @@ function doGet(e) {
                 count: document.getElementById('missionCount').value,
                 content: document.getElementById('missionContent').value.trim(),
                 reflection: `Target: ${document.getElementById('missionTarget').value} (${document.getElementById('missionCount').value} participants) | Date: ${document.getElementById('missionDate').value}`,
-                photo: '',
                 timestamp: getFormattedEnglishTimestamp()
             };
 
@@ -1452,111 +1471,96 @@ function doGet(e) {
             }
         }
 
+        // ============================================
+        // 수료증(Certificate) 로직 추가 영역
+        // ============================================
+
         async function handleCertCheck(e) {
             e.preventDefault();
-            const name = document.getElementById('certName').value.trim();
+            const name = document.getElementById('certName').value.trim().toLowerCase();
             const country = document.getElementById('certCountry').value;
-            const school = document.getElementById('certSchool').value.trim();
+            const school = document.getElementById('certSchool').value.trim().toLowerCase();
             
-            const userAtt = appData.attendance.filter(a => 
-                a.name.toLowerCase() === name.toLowerCase() && 
+            // 이름과 학교명을 덩어리(부분 일치)로 검색
+            const matchingAtt = appData.attendance.filter(a => 
+                a.name.toLowerCase().includes(name) && 
                 a.country === country && 
-                (a.school || '').toLowerCase().includes(school.toLowerCase())
+                (a.school || '').toLowerCase().includes(school)
             );
             
             const container = document.getElementById('certResultContainer');
             container.classList.remove('hidden');
-            
-            if (userAtt.length >= 4) {
-                const safeName = userAtt[0].name.replace(/'/g, "\\'");
-                const safeSchool = userAtt[0].school.replace(/'/g, "\\'");
-                
-                container.innerHTML = `
-                    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div>
-                            <h4 class="text-emerald-900 font-bold text-base flex items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Congratulations!
-                            </h4>
-                            <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-                                You have actively and faithfully participated in the sessions.<br>
-                                So, you are officially eligible for the Certificate of Completion.
-                            </p>
-                        </div>
-                        <button onclick="downloadCertificate('${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
-                            <i class="fa-solid fa-file-pdf"></i> Download Certificate
-                        </button>
-                    </div>
-                `;
-            } else {
+
+            if (matchingAtt.length === 0) {
                 container.innerHTML = `
                     <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl">
                         <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
-                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible Yet
+                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> No Records Found
                         </h4>
                         <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
-                            You currently have <strong>${userAtt.length}</strong> attendance record(s) registered under this name and school. You need at least <strong>4 records</strong> to generate the certificate.
+                            Could not find any attendance records matching your search.
                         </p>
                     </div>
                 `;
+                return;
             }
+
+            // 고유 사용자별로 그룹화
+            const usersMap = {};
+            matchingAtt.forEach(a => {
+                const key = `${a.name}|${a.country}|${a.school}`;
+                if (!usersMap[key]) usersMap[key] = { name: a.name, school: a.school, count: 0 };
+                usersMap[key].count++;
+            });
+
+            const users = Object.values(usersMap);
+            
+            container.innerHTML = users.map(u => {
+                if (u.count >= 4) {
+                    const safeName = u.name.replace(/'/g, "\\'");
+                    const safeSchool = u.school.replace(/'/g, "\\'");
+                    return `
+                        <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-3">
+                            <div>
+                                <h4 class="text-emerald-900 font-bold text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Eligible: ${u.name}
+                                </h4>
+                                <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
+                                    Total Attendance: <strong>${u.count}</strong><br>
+                                    You are officially eligible for the Certificate of Completion.
+                                </p>
+                            </div>
+                            <button onclick="downloadCertificate('${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
+                                <i class="fa-solid fa-file-pdf"></i> Download
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl mb-3">
+                            <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
+                                <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible: ${u.name}
+                            </h4>
+                            <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
+                                You currently have <strong>${u.count}</strong> attendance record(s). You need at least <strong>4 records</strong> to generate the certificate.
+                            </p>
+                        </div>
+                    `;
+                }
+            }).join('');
         }
 
+        // [수정] 상대 경로 인식을 명확히 하기 위해 "./"를 제거하고 파일명만 입력합니다.
         const PERMANENT_CERT_BG_URL = "Certificate_PE.png";
+        // ============================================
 
-        async function downloadCertificate(name, school) {
-            showToast('Generating high-quality PDF. Please wait...', 'success');
-            
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                
-                const img = new Image();
-                img.crossOrigin = "Anonymous"; 
-                img.src = PERMANENT_CERT_BG_URL + "?t=" + new Date().getTime();
-                
-                img.onload = function() {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.naturalWidth || 2000;
-                        canvas.height = img.naturalHeight || 1414;
-                        const ctx = canvas.getContext('2d');
-                        
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                        doc.addImage(imgData, 'JPEG', 0, 0, 297, 210);
-
-                        doc.setTextColor(15, 23, 42); 
-                        doc.setFont("times", "bold"); 
-                        doc.setFontSize(40); 
-                        doc.text(name, 148.5, 103, { align: "center" }); 
-                        
-                        doc.setTextColor(71, 85, 105); 
-                        doc.setFont("helvetica", "italic");
-                        doc.setFontSize(18);
-                        doc.text(school, 148.5, 115, { align: "center" }); 
-
-                        const safeFileName = name.replace(/[^a-zA-Z0-9가-힣]/g, '_');
-                        doc.save(`HWPL_Certificate_${safeFileName}.pdf`);
-                        
-                        showToast('Certificate downloaded successfully!', 'success');
-                    } catch (err) {
-                        console.error('Canvas Tainted or PDF Error:', err);
-                        showToast('보안 에러: 이미지가 홈페이지 서버와 같은 곳에 있지 않습니다.', 'error');
-                    }
-                };
-
-                img.onerror = function() {
-                    console.error('Error loading background image.');
-                    showToast('이미지 로드 실패: Certificate_PE.png 파일이 같은 폴더에 있는지 확인하세요.', 'error');
-                };
-
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showToast('An error occurred while generating the certificate.', 'error');
-            }
+        function getCohort(text) {
+            if (!text) return 'Other';
+            const t = text.toLowerCase();
+            // 기수 판별 로직
+            if (t.includes('aug') || t.includes('sep')) return '2nd Cohort (Aug-Sep)';
+            if (t.includes('nov') || t.includes('dec')) return '3rd Cohort (Nov-Dec)';
+            return 'Other';
         }
 
         function handleMyRecordLookup(e) {
@@ -1565,31 +1569,89 @@ function doGet(e) {
             const country = document.getElementById('lookupCountry').value;
             const school = document.getElementById('lookupSchool').value.trim().toLowerCase();
 
-            const userAtt = appData.attendance.filter(a => a.name.toLowerCase() === name && a.country === country && (a.school || '').toLowerCase().includes(school));
-            const userMis = appData.missions.filter(m => m.name.toLowerCase() === name && m.country === country && (m.school || '').toLowerCase().includes(school));
+            // 이름 덩어리(부분 일치)로 기록 모두 가져오기
+            const matchingAtt = appData.attendance.filter(a => a.name.toLowerCase().includes(name) && a.country === country && (a.school || '').toLowerCase().includes(school));
+            const matchingMis = appData.missions.filter(m => m.name.toLowerCase().includes(name) && m.country === country && (m.school || '').toLowerCase().includes(school));
 
-            document.getElementById('lookupResultName').textContent = document.getElementById('lookupName').value.trim() + ` (${country}, ${document.getElementById('lookupSchool').value.trim()})`;
-            document.getElementById('lookupAttCount').textContent = userAtt.length;
-            document.getElementById('lookupMisCount').textContent = userMis.length;
+            const container = document.getElementById('lookupResultContainer');
+            
+            if (matchingAtt.length === 0 && matchingMis.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 italic text-center py-4">No records found for the given information.</p>`;
+                container.classList.remove('hidden');
+                showToast('No records found.', 'error');
+                return;
+            }
 
-            const attList = document.getElementById('lookupAttList');
-            attList.innerHTML = userAtt.length ? userAtt.map(a => `
-                <div class="bg-white p-2 rounded-lg border border-teal-200 flex justify-between items-center">
-                    <div><strong>${a.session}</strong><br/><span class="text-[10px] text-slate-400">${a.school || ''} • ${a.timestamp}</span></div>
-                    <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold text-[10px]">Attended</span>
-                </div>
-            `).join('') : `<p class="text-slate-400 italic">No attendance records found.</p>`;
+            // 1차: 고유 사용자(이름+국가+학교 조합) 기준으로 데이터 분리
+            const usersMap = {};
+            
+            matchingAtt.forEach(a => {
+                const key = `${a.name}|${a.country}|${a.school}`;
+                if (!usersMap[key]) usersMap[key] = { name: a.name, country: a.country, school: a.school, att: [], mis: [] };
+                usersMap[key].att.push(a);
+            });
+            
+            matchingMis.forEach(m => {
+                const key = `${m.name}|${m.country}|${m.school}`;
+                if (!usersMap[key]) usersMap[key] = { name: m.name, country: m.country, school: m.school, att: [], mis: [] };
+                usersMap[key].mis.push(m);
+            });
 
-            const misList = document.getElementById('lookupMisList');
-            misList.innerHTML = userMis.length ? userMis.map(m => `
-                <div class="bg-white p-2 rounded-lg border border-amber-200 space-y-1">
-                    <div class="flex justify-between"><strong>${m.week}</strong><span class="text-[10px] text-slate-400">${m.timestamp}</span></div>
-                    <p class="text-slate-600 text-[11px] whitespace-pre-line">${m.content}</p>
-                    ${m.target ? `<span class="inline-block bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded">Target: ${m.target} (${m.count || 'N/A'} people)</span>` : ''}
-                </div>
-            `).join('') : `<p class="text-slate-400 italic">No mission submissions found.</p>`;
+            const users = Object.values(usersMap);
 
-            document.getElementById('lookupResultContainer').classList.remove('hidden');
+            // 2차: 사용자별로 UI 생성 시 기수(Cohort)별로 다시 그룹화하여 렌더링
+            container.innerHTML = users.map(u => {
+                const cohorts = { 
+                    '3rd Cohort (Nov-Dec)': { att: [], mis: [] }, 
+                    '2nd Cohort (Aug-Sep)': { att: [], mis: [] }, 
+                    'Other': { att: [], mis: [] } 
+                };
+                
+                u.att.forEach(a => cohorts[getCohort(a.session)].att.push(a));
+                u.mis.forEach(m => cohorts[getCohort(m.week)].mis.push(m));
+                
+                let html = `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-4 space-y-3">
+                    <div class="flex justify-between items-start border-b border-slate-200 pb-2">
+                        <div>
+                            <h4 class="font-bold text-teal-950 text-sm flex items-center gap-1.5"><i class="fa-solid fa-user text-teal-600"></i> ${u.name}</h4>
+                            <p class="text-[10px] text-slate-500 mt-0.5">${u.country} • ${u.school}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-[10px] font-bold text-teal-700">Total Att: ${u.att.length}</span>
+                            <span class="block text-[10px] font-bold text-amber-700">Total Mis: ${u.mis.length}</span>
+                        </div>
+                    </div>`;
+                    
+                ['3rd Cohort (Nov-Dec)', '2nd Cohort (Aug-Sep)', 'Other'].forEach(cohortName => {
+                    const cData = cohorts[cohortName];
+                    if (cData.att.length > 0 || cData.mis.length > 0) {
+                        html += `<div class="pt-1">
+                            <h5 class="text-xs font-extrabold text-slate-700 mb-2 px-1 border-l-[3px] border-indigo-400 bg-indigo-50/50 py-0.5 rounded-r">${cohortName}</h5>
+                            <div class="space-y-1.5 pl-1">`;
+                            
+                        cData.att.forEach(a => {
+                            html += `<div class="bg-white p-2.5 rounded-xl border border-teal-100 flex justify-between items-center shadow-sm">
+                                <div><strong class="text-teal-900">${a.session}</strong><br/><span class="text-[9px] text-slate-400">${a.timestamp}</span></div>
+                                <span class="bg-teal-100 text-teal-800 px-2 py-0.5 rounded font-bold text-[9px]">Attended</span>
+                            </div>`;
+                        });
+                        
+                        cData.mis.forEach(m => {
+                            html += `<div class="bg-white p-2.5 rounded-xl border border-amber-100 space-y-1 shadow-sm">
+                                <div class="flex justify-between items-center"><strong class="text-amber-950">${m.week}</strong><span class="text-[9px] text-slate-400">${m.timestamp}</span></div>
+                                <p class="text-slate-600 text-[10px] truncate max-w-full" title="${m.content}">Mission: ${m.content}</p>
+                            </div>`;
+                        });
+                        
+                        html += `</div></div>`;
+                    }
+                });
+                
+                html += `</div>`;
+                return html;
+            }).join('');
+
+            container.classList.remove('hidden');
             showToast('Records retrieved successfully!', 'success');
         }
 
@@ -1718,17 +1780,32 @@ function doGet(e) {
         }
 
         function renderAdminDashboard() {
-            document.getElementById('statTotalAttendance').textContent = appData.attendance.length;
-            document.getElementById('statTotalMissions').textContent = appData.missions.length;
+            const cohortFilter = document.getElementById('adminCohortFilter') ? document.getElementById('adminCohortFilter').value : '';
+            const yearFilter = document.getElementById('adminYearFilter') ? document.getElementById('adminYearFilter').value : '';
 
-            const countries = new Set([...appData.attendance.map(a => a.country), ...appData.missions.map(m => m.country)]);
+            let filteredAtt = appData.attendance;
+            let filteredMis = appData.missions;
+
+            if (cohortFilter) {
+                filteredAtt = filteredAtt.filter(a => getCohort(a.session) === cohortFilter);
+                filteredMis = filteredMis.filter(m => getCohort(m.week) === cohortFilter);
+            }
+            if (yearFilter) {
+                filteredAtt = filteredAtt.filter(a => a.year === yearFilter);
+                filteredMis = filteredMis.filter(m => m.year === yearFilter);
+            }
+
+            document.getElementById('statTotalAttendance').textContent = filteredAtt.length;
+            document.getElementById('statTotalMissions').textContent = filteredMis.length;
+
+            const countries = new Set([...filteredAtt.map(a => a.country), ...filteredMis.map(m => m.country)]);
             document.getElementById('statTotalCountries').textContent = countries.size;
 
-            const schools = new Set([...appData.attendance.map(a => a.school), ...appData.missions.map(m => m.school)]);
+            const schools = new Set([...filteredAtt.map(a => a.school), ...filteredMis.map(m => m.school)]);
             document.getElementById('statTotalSchools').textContent = schools.size;
 
-            renderAdminTable();
-            renderCharts();
+            renderCharts(filteredAtt, filteredMis);
+            filterAdminTable(); 
         }
 
         function switchAdminTab(tab) {
@@ -1766,13 +1843,14 @@ function doGet(e) {
                     <th class="p-4 text-center">Action</th>
                 `;
             }
-            renderAdminTable();
+            filterAdminTable();
         }
 
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             const search = (document.getElementById('adminSearchInput').value || '').toLowerCase();
-            const yearFilter = document.getElementById('adminYearFilter').value;
+            const yearFilter = document.getElementById('adminYearFilter') ? document.getElementById('adminYearFilter').value : '';
+            const cohortFilter = document.getElementById('adminCohortFilter') ? document.getElementById('adminCohortFilter').value : '';
             const sessionFilter = document.getElementById('adminSessionFilter') ? document.getElementById('adminSessionFilter').value : '';
 
             if (currentAdminTab === 'attendance') {
@@ -1782,8 +1860,9 @@ function doGet(e) {
                         (a.school || '').toLowerCase().includes(search) || 
                         (a.session || '').toLowerCase().includes(search);
                     const matchesYear = !yearFilter || a.year === yearFilter;
+                    const matchesCohort = !cohortFilter || getCohort(a.session) === cohortFilter;
                     const matchesSession = !sessionFilter || (a.session || '').includes(sessionFilter);
-                    return matchesSearch && matchesYear && matchesSession;
+                    return matchesSearch && matchesYear && matchesCohort && matchesSession;
                 });
 
                 if (filteredWithIndices.length === 0) {
@@ -1816,7 +1895,8 @@ function doGet(e) {
                         (m.content || '').toLowerCase().includes(search) ||
                         (m.target || '').toLowerCase().includes(search);
                     const matchesYear = !yearFilter || m.year === yearFilter;
-                    return matchesSearch && matchesYear;
+                    const matchesCohort = !cohortFilter || getCohort(m.week) === cohortFilter;
+                    return matchesSearch && matchesYear && matchesCohort;
                 });
 
                 if (filteredWithIndices.length === 0) {
@@ -1875,15 +1955,24 @@ function doGet(e) {
 
         function exportToCSV() {
             let csvContent = "data:text/csv;charset=utf-8,";
+            const cohortFilter = document.getElementById('adminCohortFilter') ? document.getElementById('adminCohortFilter').value : '';
+            const yearFilter = document.getElementById('adminYearFilter') ? document.getElementById('adminYearFilter').value : '';
+
             if (currentAdminTab === 'attendance') {
                 csvContent += "No,Name,Country,School,Position,Year,Session,Timestamp\n";
-                appData.attendance.forEach((a, i) => {
-                    csvContent += `"${i+1}","${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
+                let count = 1;
+                appData.attendance.forEach((a) => {
+                    if (cohortFilter && getCohort(a.session) !== cohortFilter) return;
+                    if (yearFilter && a.year !== yearFilter) return;
+                    csvContent += `"${count++}","${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
                 });
             } else {
                 csvContent += "No,Name,Country,School,Position,Year,Mission,Date,Target,Count,Content,Timestamp\n";
-                appData.missions.forEach((m, i) => {
-                    csvContent += `"${i+1}","${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.position || ''}","${m.year || ''}","${m.week || ''}","${m.date || ''}","${m.target || ''}","${m.count || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
+                let count = 1;
+                appData.missions.forEach((m) => {
+                    if (cohortFilter && getCohort(m.week) !== cohortFilter) return;
+                    if (yearFilter && m.year !== yearFilter) return;
+                    csvContent += `"${count++}","${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.position || ''}","${m.year || ''}","${m.week || ''}","${m.date || ''}","${m.target || ''}","${m.count || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
                 });
             }
             const encodedUri = encodeURI(csvContent);
@@ -1896,17 +1985,18 @@ function doGet(e) {
             showToast('CSV Export generated successfully!', 'success');
         }
 
-        function renderCharts() {
+        function renderCharts(attData = appData.attendance, misData = appData.missions) {
             const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
-            const sessionCounts = ['Aug 8', 'Aug 15', 'Aug 22', 'Aug 29', 'Sept 5'].map(dateStr => 
-                appData.attendance.filter(a => (a.session || '').includes(dateStr)).length
+            const sessionLabels = ['Session 1', 'Session 2', 'Session 3', 'Session 4', 'Session 5', 'Townhall'];
+            const sessionCounts = sessionLabels.map(keyword => 
+                attData.filter(a => (a.session || '').includes(keyword)).length
             );
 
             if (attendanceChartInstance) attendanceChartInstance.destroy();
             attendanceChartInstance = new Chart(ctxAtt, {
                 type: 'bar',
                 data: {
-                    labels: ['Aug 8 - Sess 1', 'Aug 15 - Sess 2', 'Aug 22 - Sess 3', 'Aug 29 - Sess 4', 'Sept 5 - Sess 5'],
+                    labels: sessionLabels,
                     datasets: [{
                         label: 'Attendance Check-ins',
                         data: sessionCounts,
@@ -1924,8 +2014,8 @@ function doGet(e) {
 
             const ctxCountry = document.getElementById('countryChart').getContext('2d');
             const countryMap = {};
-            appData.attendance.forEach(a => { if(a.country) countryMap[a.country] = (countryMap[a.country] || 0) + 1; });
-            appData.missions.forEach(m => { if(m.country) countryMap[m.country] = (countryMap[m.country] || 0) + 1; });
+            attData.forEach(a => { if(a.country) countryMap[a.country] = (countryMap[a.country] || 0) + 1; });
+            misData.forEach(m => { if(m.country) countryMap[m.country] = (countryMap[m.country] || 0) + 1; });
 
             const countries = Object.keys(countryMap);
             const counts = Object.values(countryMap);
