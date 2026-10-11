@@ -250,36 +250,54 @@ function doGet(e) {
     </header>
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
-
+        <!-- ==================== STUDENT / PARTICIPANT PORTAL VIEW ==================== -->
         <div id="studentView" class="space-y-8">
             
-            <!-- Completely redesigned Peacetown Banner using the reference image as a background -->
-            <div class="peacetown-banner rounded-3xl pt-5 pb-16 px-6 md:px-10 border border-teal-200 shadow-md relative overflow-hidden flex flex-col items-center justify-start text-center h-auto min-h-[250px] md:min-h-[280px]">
-                
-                <!-- Center aligned text content, pushed slightly up to clear the village -->
-                <div class="relative z-30 flex flex-col justify-center items-center w-full max-w-3xl space-y-3 bg-white/75 backdrop-blur-sm p-5 md:p-6 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(39,117,114,0.08)] mt-0">
-                    
-                    <div class="flex items-center justify-center gap-2 mb-1">
-                        <span class="bg-teal-100 text-teal-900 text-xs font-black px-3 py-1 rounded-full uppercase tracking-widest border border-teal-200">
-                            HWPL Peace Education
-                        </span>
-                    </div>
-
-                    <h2 class="font-serif italic text-3xl md:text-4xl lg:text-5xl text-teal-950 leading-tight drop-shadow-sm font-bold">
-                        Peace begins with me.
-                    </h2>
-
-                    <p class="text-teal-900 text-sm leading-relaxed max-w-xl font-medium mt-1">
-                        Join a global movement to foster a culture of peace through innovative education. Explore 12 essential lessons, empower future generations, and discover that lasting harmony starts from within.
-                    </p>
-
-                    <div class="pt-2">
-                        <a href="#pastRecordings" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs md:text-sm px-6 py-3 rounded-full shadow-lg transition-all items-center gap-2 transform hover:-translate-y-1 uppercase tracking-wider">
-                            <i class="fa-solid fa-circle-play text-teal-200"></i> Review Past Sessions
-                        </a>
-                    </div>
+            <!-- Banner Hero -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-teal-100 poster-card-shadow relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-teal-100 opacity-60 pointer-events-none">
+                    <i class="fa-solid fa-paper-plane text-[160px] transform -rotate-12"></i>
+                </div>
+                <div class="absolute right-1/3 top-2 text-teal-100 opacity-40 pointer-events-none">
+                    <i class="fa-solid fa-lightbulb text-7xl"></i>
                 </div>
 
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 space-y-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="tape-badge font-display font-extrabold text-xs text-amber-900 px-3 py-1 rounded-sm uppercase tracking-wider">
+                                Peace Education
+                            </span>
+                            <span class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-star text-amber-400"></i> 2026 3rd HWPL PEACE EDUCATION
+                            </span>
+                        </div>
+
+                        <h2 class="text-2xl md:text-4xl font-display font-black text-teal-900 tracking-tight leading-tight">
+                            2026 3rd HWPL PEACE EDUCATION<br class="hidden sm:inline"/> TRAINING
+                        </h2>
+
+                        <p class="text-teal-700 text-xs md:text-sm leading-relaxed max-w-2xl font-medium">
+                            Join HWPL's Peace Education Training! HWPL Peace Education Training educates teachers on HWPL peace textbook 12 lessons so that students can learn the value of peace through peace educators.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-4 bg-teal-600 text-white p-5 rounded-2xl shadow-lg border-2 border-teal-500 flex flex-col justify-center items-center text-center space-y-2 relative transform hover:scale-[1.02] transition-transform">
+                        <div class="absolute -top-3 bg-tape text-teal-950 font-black text-[11px] px-3 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                            SCHEDULE & TIME
+                        </div>
+                        <div class="text-xl font-display font-black text-emerald-300 tracking-wide mt-1">
+                            NOV 7 – DEC 12
+                        </div>
+                        <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-400/60 pb-2 w-full">
+                            EVERY SATURDAY
+                        </div>
+                        <div class="pt-1 text-xs space-y-0.5 font-semibold text-teal-50">
+                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30 AM</p>
+                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 2:30 PM</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <section class="bg-white rounded-3xl p-6 md:p-8 border-2 border-teal-200 shadow-md space-y-5">
@@ -400,8 +418,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Orientation & Core Values</h4>
                             <p class="text-[11px] text-slate-300">HWPL Peace Education 12 Lessons Overview</p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -414,8 +432,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 1 ~ 2</h4>
                             <p class="text-[11px] text-slate-300">All Creation Living in Harmony</p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -428,8 +446,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 3 ~ 4</h4>
                             <p class="text-[11px] text-slate-300">What Broke Peace & Restoration of Order</p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -442,8 +460,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 5 ~ 8</h4>
                             <p class="text-[11px] text-slate-300">Gratitude, Consideration, Sacrifice, Forgiveness </p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -456,8 +474,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 9 ~ 12</h4>
                             <p class="text-[11px] text-slate-300">Respect, Heritage, Law-Abiding Spirit, Messenger of Peace </p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
 
@@ -467,11 +485,11 @@ function doGet(e) {
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Townhall</span>
                                 <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Dec 12</span>
                             </div>
-                            <h4 class="font-display font-bold text-sm">HWPL Peace Educators' Gathering</h4>
+                            <h4 class="font-display font-bold text-sm">Townhall for HWPL Peace Educators</h4>
                             <p class="text-[11px] text-slate-300">Sharing Reflections & Commitments</p>
                         </div>
-                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
-                            <i class="fa-solid fa-video-slash"></i> Video Pending
+                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fa-solid fa-clock"></i> Coming Soon
                         </button>
                     </div>
                 </div>
