@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Chosen Palette: Deep Teal & Emerald Warm Neutrals -->
-    <!-- Application Structure Plan: Designed as a 3-section participant portal plus RSVP and Admin Dashboard. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HWPL 08 Peace Education Training - Portal & Administration</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PDF Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -39,17 +39,6 @@
                             950: '#0f2928'
                         },
                         tape: '#f5e5a3'
-                    },
-                    animation: {
-                        'blob': 'blob 7s infinite',
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        }
                     }
                 }
             }
@@ -63,13 +52,11 @@
             background-size: 30px 30px;
             background-position: 0 0, 15px 15px;
         }
-
         .tape-badge {
             background-color: #f6ea9d;
             box-shadow: 2px 3px 0px rgba(0,0,0,0.1);
             transform: rotate(-3deg);
         }
-
         .chart-container {
             position: relative;
             width: 100%;
@@ -79,7 +66,6 @@
             height: 260px;
             max-height: 320px;
         }
-
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -100,7 +86,7 @@
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- 처음 로딩 시 바로 보이도록 hidden 클래스 제거 -->
+    <!-- Site Gate Modal (Password: 2026) -->
     <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-5 transform transition-all">
             <div>
@@ -110,11 +96,9 @@
             </div>
             <form onsubmit="verifySitePasscode(event)" class="space-y-3">
                 <div>
-                    <!-- 비밀번호 입력칸 -->
                     <input type="password" id="sitePasscodeInput" required placeholder="Access Code" class="w-full text-center px-4 py-3 border border-slate-300 rounded-xl text-base font-bold tracking-widest focus:ring-2 focus:ring-teal-500 focus:outline-none">
                 </div>
                 <div class="flex gap-2">
-                    <!-- Quick Bypass 버튼 삭제 및 Enter Portal 버튼을 100% 너비(w-full)로 수정 -->
                     <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-key"></i> Enter Portal
                     </button>
@@ -124,6 +108,7 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
     <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center space-y-4">
             <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto text-xl font-bold">
@@ -144,6 +129,7 @@
         </div>
     </div>
 
+    <!-- Apps Script Integration Guide Modal -->
     <div id="appsScriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-3xl w-full shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
@@ -168,11 +154,11 @@
     data.session || data.week || '',
     data.content || '',
     data.reflection || '',
-    data.gender || '',     // J열: 성별 (RSVP)
-    data.email || '',      // K열: 이메일 (RSVP)
-    data.phone || '',      // L열: 연락처 (RSVP)
-    data.referrer || '',   // M열: 추천인 (RSVP)
-    data.consent || ''     // N열: 개인정보동의 (RSVP)
+    data.gender || '',     // J
+    data.email || '',      // K
+    data.phone || '',      // L
+    data.referrer || '',   // M
+    data.consent || ''     // N
   ]);
   return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
 }
@@ -213,6 +199,7 @@ function doGet(e) {
         </div>
     </div>
 
+    <!-- Header Navigation -->
     <header class="bg-white/90 backdrop-blur-md border-b border-teal-100 sticky top-0 z-40 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -237,13 +224,13 @@ function doGet(e) {
     </header>
 
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
+        
         <!-- ==================== STUDENT / PARTICIPANT PORTAL VIEW ==================== -->
         <div id="studentView" class="space-y-8">
             
-            <!-- Redesigned Main Banner Matching the Reference Image -->
-            <div class="bg-white rounded-[2rem] p-6 md:p-8 lg:p-10 border-2 border-teal-50 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 z-10">
+            <!-- Hero Banner -->
+            <div class="bg-white rounded-[2rem] p-6 md:p-10 border-2 border-teal-50 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 z-10">
                 
-                <!-- Background Decorations -->
                 <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#1f4c4a 2px, transparent 2px); background-size: 24px 24px;"></div>
                 
                 <div class="absolute top-8 left-[55%] text-teal-100 opacity-60 text-6xl pointer-events-none transform -rotate-12">
@@ -257,8 +244,7 @@ function doGet(e) {
                     <i class="fa-solid fa-star"></i>
                 </div>
 
-                <!-- Left Content -->
-                <div class="w-full md:w-[60%] lg:w-[65%] space-y-4 relative z-10">
+                <div class="w-full md:w-[60%] space-y-4 relative z-10">
                     <div class="flex flex-wrap items-center gap-3 mb-2">
                         <span class="bg-[#f6ea9d] text-amber-900 text-[11px] md:text-xs font-black px-3 py-1.5 rounded-sm uppercase tracking-wider transform -rotate-2 shadow-sm border border-amber-200/50">
                             Peace Education
@@ -280,22 +266,19 @@ function doGet(e) {
                         <a href="https://app.notion.com/p/HWPL-Peace-Education-Guideline-3fca96517a74809bbcb5c27aa2d7d46e" target="_blank" rel="noopener noreferrer" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all items-center gap-2 uppercase tracking-wider">
                             <i class="fa-solid fa-book-open text-teal-200"></i> Peace Education Material
                         </a>
-                        <!-- RSVP Button -->
                         <a href="#rsvpSection" class="inline-flex bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all items-center gap-2 uppercase tracking-wider">
                             <i class="fa-solid fa-user-plus text-amber-100"></i> RSVP Now
                         </a>
                     </div>
                 </div>
 
-                <!-- Right Content (Schedule Card) -->
-                <div class="w-full md:w-[40%] lg:w-[35%] relative z-10 flex justify-center md:justify-end mt-6 md:mt-0">
+                <div class="w-full md:w-[35%] relative z-10 flex justify-center md:justify-end mt-6 md:mt-0 shrink-0">
                     <div class="bg-[#277572] text-white p-6 md:p-8 rounded-[1.5rem] shadow-xl border-4 border-white flex flex-col justify-center items-center text-center space-y-3 relative w-full max-w-sm transform hover:scale-[1.02] transition-transform">
-                        <!-- Overlapping Badge -->
                         <div class="absolute -top-4 bg-[#f6ea9d] text-[#7a5c17] font-black text-[11px] md:text-xs px-4 py-1.5 rounded-md shadow uppercase tracking-widest border border-[#e5d482]">
                             SCHEDULE & TIME
                         </div>
                         
-                        <div class="text-2xl md:text-3xl font-display font-black text-[#6ee7b7] tracking-wide mt-2 drop-shadow-md">
+                        <div class="text-2xl md:text-3xl font-display font-black text-[#6ee7b7] tracking-wide mt-2 drop-shadow-md whitespace-nowrap">
                             NOV 7 – DEC 12
                         </div>
                         <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-500/60 pb-3 w-full">
@@ -344,7 +327,6 @@ function doGet(e) {
                             <option value="Malawi">Malawi</option>
                             <option value="Netherlands">Netherlands</option>
                             <option value="Sint Maarten">Sint Maarten</option>
-                            <option value="South Africa">South Africa</option>
                             <option value="South Korea">South Korea</option>
                             <option value="United Kingdom">United Kingdom</option>
                             <option value="Zambia">Zambia</option>
@@ -427,8 +409,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Orientation & Core Values</h4>
                             <p class="text-[11px] text-slate-300">HWPL Peace Education 12 Lessons Overview</p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
 
@@ -441,8 +423,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 1 ~ 2</h4>
                             <p class="text-[11px] text-slate-300">All Creation Living in Harmony</p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
 
@@ -455,8 +437,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 3 ~ 4</h4>
                             <p class="text-[11px] text-slate-300">What Broke Peace & Restoration of Order</p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
 
@@ -469,8 +451,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 5 ~ 8</h4>
                             <p class="text-[11px] text-slate-300">Gratitude, Consideration, Sacrifice, Forgiveness </p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
 
@@ -483,8 +465,8 @@ function doGet(e) {
                             <h4 class="font-display font-bold text-sm">Lessons 9 ~ 12</h4>
                             <p class="text-[11px] text-slate-300">Respect, Heritage, Law-Abiding Spirit, Messenger of Peace </p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
 
@@ -494,11 +476,11 @@ function doGet(e) {
                                 <span class="bg-indigo-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">Townhall</span>
                                 <span class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar-days mr-1"></i>Dec 12</span>
                             </div>
-                            <h4 class="font-display font-bold text-sm">Townhall for HWPL Peace Educators</h4>
+                            <h4 class="font-display font-bold text-sm">HWPL Peace Educators' Gathering</h4>
                             <p class="text-[11px] text-slate-300">Sharing Reflections & Commitments</p>
                         </div>
-                        <button disabled class="bg-slate-700 text-slate-500 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
-                            <i class="fa-solid fa-clock"></i> Coming Soon
+                        <button type="button" disabled class="bg-slate-800 text-slate-500 border border-slate-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm cursor-not-allowed w-full transition-all">
+                            <i class="fa-solid fa-video-slash"></i> Video Pending
                         </button>
                     </div>
                 </div>
@@ -532,7 +514,6 @@ function doGet(e) {
                                 <option value="Malawi">Malawi</option>
                                 <option value="Netherlands">Netherlands</option>
                                 <option value="Sint Maarten">Sint Maarten</option>
-                                <option value="South Africa">South Africa</option>
                                 <option value="South Korea">South Korea</option>
                                 <option value="United Kingdom">United Kingdom</option>
                                 <option value="Zambia">Zambia</option>
@@ -641,7 +622,6 @@ function doGet(e) {
                             <option value="Malawi">Malawi</option>
                             <option value="Netherlands">Netherlands</option>
                             <option value="Sint Maarten">Sint Maarten</option>
-                            <option value="South Africa">South Africa</option>
                             <option value="South Korea">South Korea</option>
                             <option value="United Kingdom">United Kingdom</option>
                             <option value="Zambia">Zambia</option>
@@ -790,7 +770,6 @@ function doGet(e) {
                             <option value="Malawi">Malawi</option>
                             <option value="Netherlands">Netherlands</option>
                             <option value="Sint Maarten">Sint Maarten</option>
-                            <option value="South Africa">South Africa</option>
                             <option value="South Korea">South Korea</option>
                             <option value="United Kingdom">United Kingdom</option>
                             <option value="Zambia">Zambia</option>
@@ -825,7 +804,6 @@ function doGet(e) {
                             <option value="Malawi">Malawi</option>
                             <option value="Netherlands">Netherlands</option>
                             <option value="Sint Maarten">Sint Maarten</option>
-                            <option value="South Africa">South Africa</option>
                             <option value="South Korea">South Korea</option>
                             <option value="United Kingdom">United Kingdom</option>
                             <option value="Zambia">Zambia</option>
@@ -859,7 +837,6 @@ function doGet(e) {
                         <option value="Malawi">Malawi</option>
                         <option value="Netherlands">Netherlands</option>
                         <option value="Sint Maarten">Sint Maarten</option>
-                        <option value="South Africa">South Africa</option>
                         <option value="South Korea">South Korea</option>
                         <option value="United Kingdom">United Kingdom</option>
                         <option value="Zambia">Zambia</option>
@@ -873,7 +850,7 @@ function doGet(e) {
                 </form>
                 
                 <div id="certResultContainer" class="hidden pt-4 border-t border-slate-100">
-                    <!-- 결과 메시지가 동적으로 삽입됩니다 -->
+                    <!-- Dynamic Result -->
                 </div>
             </section>
 
@@ -897,7 +874,6 @@ function doGet(e) {
                         <option value="Malawi">Malawi</option>
                         <option value="Netherlands">Netherlands</option>
                         <option value="Sint Maarten">Sint Maarten</option>
-                        <option value="South Africa">South Africa</option>
                         <option value="South Korea">South Korea</option>
                         <option value="United Kingdom">United Kingdom</option>
                         <option value="Zambia">Zambia</option>
@@ -912,7 +888,6 @@ function doGet(e) {
                 <div id="peaceMsgList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto pt-2"></div>
             </div>
 
-            <!-- ==================== 추가된 RSVP (사전 등록) 폼 섹션 ==================== -->
             <section id="rsvpSection" class="bg-gradient-to-br from-teal-50 to-white rounded-3xl p-6 md:p-8 border-2 border-teal-300 shadow-lg space-y-5 relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-8 opacity-5 text-teal-900 pointer-events-none transform translate-x-4 -translate-y-4">
                     <i class="fa-solid fa-envelope-open-text text-9xl"></i>
@@ -995,7 +970,6 @@ function doGet(e) {
                         <input type="text" id="rsvpReferrer" required placeholder="Who invited you?" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
                     </div>
 
-                    <!-- Privacy Consent -->
                     <div class="md:col-span-2 lg:col-span-3 mt-2 bg-teal-50 border border-teal-100 p-4 rounded-xl">
                         <label class="flex items-start gap-3 cursor-pointer">
                             <input type="checkbox" id="rsvpConsent" required class="mt-1 w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
@@ -1013,10 +987,9 @@ function doGet(e) {
                     </div>
                 </form>
             </section>
-            <!-- ========================================================================= -->
-
         </div>
 
+        <!-- ==================== ADMIN VIEW ==================== -->
         <div id="adminView" class="hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-3xl border border-teal-100 shadow-sm">
                 <div>
@@ -1028,7 +1001,6 @@ function doGet(e) {
                     <button onclick="refreshAdminData()" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
                         <i class="fa-solid fa-rotate"></i> Sync & Refresh Data
                     </button>
-                    <!-- 누락되었던 Integration Guide 및 Export 버튼 복구 -->
                     <button onclick="openAppsScriptGuide()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
                         <i class="fa-solid fa-code"></i> Integration Guide
                     </button>
@@ -1038,54 +1010,72 @@ function doGet(e) {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-white p-5 rounded-2xl border border-teal-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-users"></i>
+            <!-- Admin Statistics Metrics -->
+            <div class="space-y-3">
+                <h3 class="font-display font-bold text-teal-900 text-sm"><i class="fa-solid fa-chart-line mr-1"></i> PET (Actual Participation)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-teal-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Participating Countries</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statPetCountries">0</h3>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Total Attendance</p>
-                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalAttendance">0</h3>
+                    <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Organizations / Schools</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statPetSchools">0</h3>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-file-pen"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Total Missions</p>
-                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalMissions">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-envelope-open-text"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Total RSVPs</p>
-                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalRsvps">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-globe"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Countries</p>
-                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalCountries">0</h3>
+                    <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Participating Teachers</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statPetTeachers">0</h3>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-school"></i>
+
+                <h3 class="font-display font-bold text-indigo-900 text-sm mt-4"><i class="fa-solid fa-user-plus mr-1"></i> RSVP (Expected Participation)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-earth-americas"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Expected Countries</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statRsvpCountries">0</h3>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Organizations</p>
-                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalSchools">0</h3>
+                    <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Expected Schools</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statRsvpSchools">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Expected Teachers</p>
+                            <h3 class="text-2xl font-display font-black text-slate-900" id="statRsvpTeachers">0</h3>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Admin Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-3xl border border-teal-100 shadow-sm space-y-4">
                     <h4 class="font-display font-extrabold text-teal-950 text-base">Attendance by Session</h4>
@@ -1101,6 +1091,7 @@ function doGet(e) {
                 </div>
             </div>
 
+            <!-- Admin Table -->
             <div class="bg-white rounded-3xl border border-teal-100 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1111,9 +1102,9 @@ function doGet(e) {
                     <div class="flex flex-wrap gap-2 w-full lg:w-auto">
                         <div class="w-full sm:w-44">
                             <select id="adminCohortFilter" onchange="renderAdminDashboard()" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none font-bold text-teal-800">
-                                <option value="">All Cohorts (2nd & 3rd)</option>
-                                <option value="3rd Cohort (Nov-Dec)">3rd Cohort (Nov-Dec)</option>
-                                <option value="2nd Cohort (Aug-Sep)">2nd Cohort (Aug-Sep)</option>
+                                <option value="">All Cohorts (2026 2nd & 3rd)</option>
+                                <option value="2026 3rd Cohort (Nov-Dec)">2026 3rd Cohort (Nov-Dec)</option>
+                                <option value="2026 2nd Cohort (Aug-Sep)">2026 2nd Cohort (Aug-Sep)</option>
                             </select>
                         </div>
                         <div class="w-full sm:w-28">
@@ -1167,10 +1158,9 @@ function doGet(e) {
 
     </main>
 
-    <!-- 수료증 렌더링용 숨겨진 템플릿 (화면 밖으로 배치하여 사용자는 보지 못하게 함) -->
+    <!-- Certificate Template (Hidden) -->
     <div id="certificateTemplateWrapper" style="position: absolute; left: -9999px; top: -9999px;">
         <div id="certificateTemplate" class="w-[850px] h-[600px] bg-white relative p-12 overflow-hidden flex flex-col justify-center items-center text-center font-serif border-[16px] border-double border-yellow-600 shadow-2xl">
-            <!-- 배경 패턴 및 장식 -->
             <div class="absolute inset-0 bg-yellow-50/60" style="background-image: radial-gradient(#d97706 1px, transparent 1px); background-size: 40px 40px; opacity: 0.1;"></div>
             
             <div class="absolute top-0 left-0 w-32 h-32 border-t-[10px] border-l-[10px] border-yellow-700 m-5"></div>
@@ -1231,9 +1221,8 @@ function doGet(e) {
             });
         }
 
-        // English Date Picker State & Logic
         let calSelectedYear = 2026;
-        let calSelectedMonth = 7; // 0-indexed: 7 = August
+        let calSelectedMonth = 7; 
 
         const monthNamesEng = [
             'January', 'February', 'March', 'April', 'May', 'June', 
@@ -1345,15 +1334,8 @@ function doGet(e) {
             }
         });
 
-        // 초기 목업 데이터에 rsvp 항목 추가
         let appData = {
-            attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 1', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 2', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 3', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 4', timestamp: getFormattedEnglishTimestamp() },
-                { name: 'Jean Dupont', country: 'France', school: 'Paris Education Institute', position: 'Principal', year: '2026', session: 'Aug 8', timestamp: getFormattedEnglishTimestamp() }
-            ])),
+            attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || '[]'),
             missions: JSON.parse(localStorage.getItem('hwpl_missions') || '[]'),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || '[]'),
             peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || '[]'),
@@ -1382,6 +1364,7 @@ function doGet(e) {
                     const fetchedQna = [];
                     const fetchedPeaceMsg = [];
                     const fetchedRsvp = [];
+                    
                     data.forEach(item => {
                         if (item.type === 'attendance') {
                             fetchedAttendance.push(item);
@@ -1397,11 +1380,13 @@ function doGet(e) {
                             fetchedRsvp.push(item);
                         }
                     });
+                    
                     if (fetchedAttendance.length > 0) appData.attendance = fetchedAttendance;
                     if (fetchedMissions.length > 0) appData.missions = fetchedMissions;
                     if (fetchedQna.length > 0) appData.qna = fetchedQna;
                     if (fetchedPeaceMsg.length > 0) appData.peaceMsg = fetchedPeaceMsg;
                     if (fetchedRsvp.length > 0) appData.rsvp = fetchedRsvp;
+                    
                     saveToLocalStorage();
                     renderQnaList();
                     renderPeaceMsgList();
@@ -1438,11 +1423,6 @@ function doGet(e) {
             } else {
                 showToast('Incorrect access code. Please try again.', 'error');
             }
-        }
-
-        function bypassSiteGate() {
-            document.getElementById('siteGateModal').classList.add('hidden');
-            showToast('Portal accessed via quick bypass.', 'success');
         }
 
         async function switchMode(mode) {
@@ -1627,7 +1607,6 @@ function doGet(e) {
             }
         }
 
-        // RSVP 폼 제출 핸들러
         async function handleRsvpSubmit(event) {
             event.preventDefault();
             
@@ -1651,21 +1630,20 @@ function doGet(e) {
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
-                // 구글 시트에 "rsvp" 타입으로 전송 (분리된 칼럼 사용)
                 await syncAndRefreshAfterSubmit({
                     type: 'rsvp',
                     name: formData.name,
                     country: formData.country,
                     school: formData.school,
-                    position: formData.job, 
-                    session: '2026 3rd Cohort', // 3기 RSVP임을 명확히 표기
-                    content: '', 
-                    reflection: '', 
-                    gender: formData.gender,     // 새 칼럼(J열)
-                    email: formData.email,       // 새 칼럼(K열)
-                    phone: formData.phone,       // 새 칼럼(L열)
-                    referrer: formData.referrer, // 새 칼럼(M열)
-                    consent: formData.consent,   // 새 칼럼(N열)
+                    position: formData.job,
+                    session: `2026 3rd Cohort (Nov-Dec)`, 
+                    content: `N/A`,
+                    reflection: `N/A`,
+                    gender: formData.gender,
+                    email: formData.email,
+                    phone: formData.phone,
+                    referrer: formData.referrer,
+                    consent: formData.consent,
                     timestamp: formData.timestamp
                 });
                 showToast('RSVP submitted successfully!', 'success');
@@ -1679,18 +1657,16 @@ function doGet(e) {
         }
 
         // ============================================
-        // 수료증(Certificate) 로직 추가 영역
+        // 수료증(Certificate) 로직
         // ============================================
-
         async function handleCertCheck(e) {
             e.preventDefault();
             const name = document.getElementById('certName').value.trim().toLowerCase();
             const country = document.getElementById('certCountry').value;
             const school = document.getElementById('certSchool').value.trim().toLowerCase();
             
-            // 이름과 학교명을 덩어리(부분 일치)로 검색
             const matchingAtt = appData.attendance.filter(a => 
-                a.name.toLowerCase().includes(name) && 
+                (a.name || '').toLowerCase().includes(name) && 
                 a.country === country && 
                 (a.school || '').toLowerCase().includes(school)
             );
@@ -1712,11 +1688,15 @@ function doGet(e) {
                 return;
             }
 
-            // 고유 사용자별로 그룹화
             const usersMap = {};
             matchingAtt.forEach(a => {
-                const key = `${a.name}|${a.country}|${a.school}`;
-                if (!usersMap[key]) usersMap[key] = { name: a.name, school: a.school, count: 0 };
+                const normName = (a.name || '').trim().toLowerCase();
+                const normSchool = (a.school || '').trim().toLowerCase();
+                const key = `${normName}|${a.country}|${normSchool}`;
+                
+                if (!usersMap[key]) {
+                    usersMap[key] = { name: (a.name || '').trim(), school: (a.school || '').trim(), count: 0 };
+                }
                 usersMap[key].count++;
             });
 
@@ -1737,7 +1717,7 @@ function doGet(e) {
                                     You are officially eligible for the Certificate of Completion.
                                 </p>
                             </div>
-                            <button onclick="downloadCertificate('${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
+                            <button type="button" onclick="downloadCertificate(event, '${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
                                 <i class="fa-solid fa-file-pdf"></i> Download
                             </button>
                         </div>
@@ -1757,15 +1737,53 @@ function doGet(e) {
             }).join('');
         }
 
-        const PERMANENT_CERT_BG_URL = "Certificate_PE.png";
-        // ============================================
+        async function downloadCertificate(event, name, school) {
+            try {
+                const btn = event.currentTarget;
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+                showToast('Generating certificate. Please wait...', 'success');
 
+                document.getElementById('renderCertName').textContent = name;
+                document.getElementById('renderCertSchool').textContent = school;
+
+                const template = document.getElementById('certificateTemplate');
+                
+                const canvas = await html2canvas(template, {
+                    scale: 2, 
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [850, 600]
+                });
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, 850, 600);
+                pdf.save(`HWPL_Certificate_${name.replace(/\s+/g, '_')}.pdf`);
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showToast('Certificate downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                showToast('Failed to download certificate.', 'error');
+            }
+        }
+
+        // ============================================
         function getCohort(text) {
             if (!text) return 'Other';
             const t = text.toLowerCase();
-            // 기수 판별 로직
-            if (t.includes('aug') || t.includes('sep')) return '2nd Cohort (Aug-Sep)';
-            if (t.includes('nov') || t.includes('dec')) return '3rd Cohort (Nov-Dec)';
+            if (t.includes('aug') || t.includes('sep')) return '2026 2nd Cohort (Aug-Sep)';
+            if (t.includes('nov') || t.includes('dec')) return '2026 3rd Cohort (Nov-Dec)';
+            if (t.includes('3rd cohort')) return '2026 3rd Cohort (Nov-Dec)';
             return 'Other';
         }
 
@@ -1775,9 +1793,8 @@ function doGet(e) {
             const country = document.getElementById('lookupCountry').value;
             const school = document.getElementById('lookupSchool').value.trim().toLowerCase();
 
-            // 이름 덩어리(부분 일치)로 기록 모두 가져오기
-            const matchingAtt = appData.attendance.filter(a => a.name.toLowerCase().includes(name) && a.country === country && (a.school || '').toLowerCase().includes(school));
-            const matchingMis = appData.missions.filter(m => m.name.toLowerCase().includes(name) && m.country === country && (m.school || '').toLowerCase().includes(school));
+            const matchingAtt = appData.attendance.filter(a => (a.name||'').toLowerCase().includes(name) && a.country === country && (a.school || '').toLowerCase().includes(school));
+            const matchingMis = appData.missions.filter(m => (m.name||'').toLowerCase().includes(name) && m.country === country && (m.school || '').toLowerCase().includes(school));
 
             const container = document.getElementById('lookupResultContainer');
             
@@ -1788,7 +1805,6 @@ function doGet(e) {
                 return;
             }
 
-            // 1차: 고유 사용자(이름+국가+학교 조합) 기준으로 데이터 분리
             const usersMap = {};
             
             matchingAtt.forEach(a => {
@@ -1805,11 +1821,10 @@ function doGet(e) {
 
             const users = Object.values(usersMap);
 
-            // 2차: 사용자별로 UI 생성 시 기수(Cohort)별로 다시 그룹화하여 렌더링
             container.innerHTML = users.map(u => {
                 const cohorts = { 
-                    '3rd Cohort (Nov-Dec)': { att: [], mis: [] }, 
-                    '2nd Cohort (Aug-Sep)': { att: [], mis: [] }, 
+                    '2026 3rd Cohort (Nov-Dec)': { att: [], mis: [] }, 
+                    '2026 2nd Cohort (Aug-Sep)': { att: [], mis: [] }, 
                     'Other': { att: [], mis: [] } 
                 };
                 
@@ -1828,7 +1843,7 @@ function doGet(e) {
                         </div>
                     </div>`;
                     
-                ['3rd Cohort (Nov-Dec)', '2nd Cohort (Aug-Sep)', 'Other'].forEach(cohortName => {
+                ['2026 3rd Cohort (Nov-Dec)', '2026 2nd Cohort (Aug-Sep)', 'Other'].forEach(cohortName => {
                     const cData = cohorts[cohortName];
                     if (cData.att.length > 0 || cData.mis.length > 0) {
                         html += `<div class="pt-1">
@@ -1989,8 +2004,8 @@ function doGet(e) {
             const cohortFilter = document.getElementById('adminCohortFilter') ? document.getElementById('adminCohortFilter').value : '';
             const yearFilter = document.getElementById('adminYearFilter') ? document.getElementById('adminYearFilter').value : '';
 
-            let filteredAtt = appData.attendance;
-            let filteredMis = appData.missions;
+            let filteredAtt = appData.attendance || [];
+            let filteredMis = appData.missions || [];
             let filteredRsvp = appData.rsvp || [];
 
             if (cohortFilter) {
@@ -2003,15 +2018,17 @@ function doGet(e) {
                 filteredMis = filteredMis.filter(m => m.year === yearFilter);
             }
 
-            document.getElementById('statTotalAttendance').textContent = filteredAtt.length;
-            document.getElementById('statTotalMissions').textContent = filteredMis.length;
-            document.getElementById('statTotalRsvps').textContent = filteredRsvp.length;
+            const getUniqueCount = (arr) => new Set(arr.filter(item => item && item.trim() !== '').map(item => item.trim().toLowerCase())).size;
 
-            const countries = new Set([...filteredAtt.map(a => a.country), ...filteredMis.map(m => m.country), ...filteredRsvp.map(r => r.country)]);
-            document.getElementById('statTotalCountries').textContent = countries.size;
+            // PET
+            document.getElementById('statPetCountries').textContent = getUniqueCount([...filteredAtt.map(a => a.country), ...filteredMis.map(m => m.country)]);
+            document.getElementById('statPetSchools').textContent = getUniqueCount([...filteredAtt.map(a => a.school), ...filteredMis.map(m => m.school)]);
+            document.getElementById('statPetTeachers').textContent = getUniqueCount([...filteredAtt.map(a => a.name), ...filteredMis.map(m => m.name)]);
 
-            const schools = new Set([...filteredAtt.map(a => a.school), ...filteredMis.map(m => m.school), ...filteredRsvp.map(r => r.school)]);
-            document.getElementById('statTotalSchools').textContent = schools.size;
+            // RSVP
+            document.getElementById('statRsvpCountries').textContent = getUniqueCount(filteredRsvp.map(r => r.country));
+            document.getElementById('statRsvpSchools').textContent = getUniqueCount(filteredRsvp.map(r => r.school));
+            document.getElementById('statRsvpTeachers').textContent = getUniqueCount(filteredRsvp.map(r => r.name));
 
             renderCharts(filteredAtt, filteredMis);
             filterAdminTable(); 
@@ -2105,6 +2122,49 @@ function doGet(e) {
                         <td class="p-4 text-slate-400 text-[11px]">${a.timestamp || ''}</td>
                         <td class="p-4 text-center">
                             <button onclick="deleteRecord('attendance', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else if (currentAdminTab === 'missions') {
+                const filteredWithIndices = appData.missions.map((m, idx) => ({ item: m, index: idx })).filter(({ item: m }) => {
+                    const matchesSearch = (m.name || '').toLowerCase().includes(search) || 
+                        (m.country || '').toLowerCase().includes(search) || 
+                        (m.school || '').toLowerCase().includes(search) || 
+                        (m.week || '').toLowerCase().includes(search) ||
+                        (m.content || '').toLowerCase().includes(search) ||
+                        (m.target || '').toLowerCase().includes(search);
+                    const matchesYear = !yearFilter || m.year === yearFilter;
+                    const matchesCohort = !cohortFilter || getCohort(m.week) === cohortFilter;
+                    return matchesSearch && matchesYear && matchesCohort;
+                });
+
+                if (filteredWithIndices.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">No mission submissions found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filteredWithIndices.map(({ item: m, index: idx }, displayIdx) => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 text-slate-500 font-bold">${displayIdx + 1}</td>
+                        <td class="p-4 font-bold text-slate-900">${m.name || ''}</td>
+                        <td class="p-4">${m.country || ''}</td>
+                        <td class="p-4">${m.school || ''}</td>
+                        <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.position || 'N/A'}</span></td>
+                        <td class="p-4 font-semibold text-amber-950">${m.week || ''}</td>
+                        <td class="p-4">
+                            <div class="space-y-0.5">
+                                <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded inline-block">${m.target || 'N/A'} (${m.count || '0'})</span>
+                                <p class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar mr-1"></i>${m.date || 'N/A'}</p>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <p class="max-w-xs truncate text-slate-700 whitespace-pre-line" title="${m.content || ''}">${m.content || ''}</p>
+                        </td>
+                        <td class="p-4 text-slate-400 text-[11px]">${m.timestamp || ''}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteRecord('missions', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
@@ -2274,7 +2334,6 @@ function doGet(e) {
         window.onload = async function() {
             renderQnaList();
             renderPeaceMsgList();
-            
             await fetchGoogleSheetData();
         };
     </script>
