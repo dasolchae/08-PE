@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
     <!-- Chosen Palette: Deep Teal & Emerald Warm Neutrals -->
-    <!-- Application Structure Plan: Designed as a 3-section participant portal plus 50/50 utility tools and a full-width community footer, alongside a password-protected admin analytics dashboard. Section 1 handles live attendance check-ins. Section 2 provides video links and reflections. Section 3 handles mission homework submission with an interactive custom English calendar picker for Implementation Date (YYYY-MM-DD), target audience, audience count, detailed reflection contents, and submitting at least 3 photo proof images to assigned coordinators or group chats. Below, My Record Lookup and Q&A share a 2-column equal grid layout, followed by Global Peace Messages. -->
-    <!-- Visualization & Content Choices: Replaced all SVGs with FontAwesome icon fonts and Chart.js Canvas components. Chart.js bar and doughnut charts run inside responsive container divs with controlled max-width and max-height. Dynamic JS handles local storage fallback, English calendar date picker, and fetch sync with Google Apps Script. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
+    <!-- Application Structure Plan: Designed as a 3-section participant portal plus RSVP and Admin Dashboard. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HWPL 08 Peace Education Training - Portal & Administration</title>
@@ -13,11 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- 추가된 구글 폰트: 우아한 명조체(Playfair Display) 적용 -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- 추가된 라이브러리: jsPDF (단독으로 사용하여 PDF 렌더링 에러 해결) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
@@ -27,8 +21,8 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'], // 메인 슬로건용 폰트
-                        signature: ['"Brush Script MT"', 'cursive'] // 수료증 서명용 폰트
+                        serif: ['"Playfair Display"', 'serif'],
+                        signature: ['"Brush Script MT"', 'cursive']
                     },
                     colors: {
                         teal: {
@@ -76,19 +70,6 @@
             transform: rotate(-3deg);
         }
 
-        .poster-card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(39, 117, 114, 0.15), 0 8px 10px -6px rgba(39, 117, 114, 0.1);
-        }
-        
-        .peacetown-banner {
-            background-color: #e6f4f1; /* Soft teal background */
-            /* 은은한 청록색 그라데이션 필터를 입혀 마을 이미지의 하늘과 자연스럽게 블렌딩되도록 처리 */
-            background-image: linear-gradient(to bottom, rgba(230, 244, 241, 0.95) 0%, rgba(230, 244, 241, 0.4) 45%, transparent 100%), url('image_12a296.jpg'); 
-            background-size: cover;
-            background-position: bottom center;
-            background-repeat: no-repeat;
-        }
-
         .chart-container {
             position: relative;
             width: 100%;
@@ -112,10 +93,6 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #33928e;
-        }
-        
-        .animation-delay-2000 {
-            animation-delay: 2s;
         }
     </style>
 </head>
@@ -253,48 +230,70 @@ function doGet(e) {
         <!-- ==================== STUDENT / PARTICIPANT PORTAL VIEW ==================== -->
         <div id="studentView" class="space-y-8">
             
-            <!-- Banner Hero -->
-            <div class="bg-white rounded-3xl p-6 md:p-8 border border-teal-100 poster-card-shadow relative overflow-hidden">
-                <div class="absolute -right-6 -bottom-6 text-teal-100 opacity-60 pointer-events-none">
-                    <i class="fa-solid fa-paper-plane text-[160px] transform -rotate-12"></i>
+            <!-- Redesigned Main Banner Matching the Reference Image -->
+            <div class="bg-white rounded-[2rem] p-6 md:p-8 lg:p-10 border-2 border-teal-50 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 z-10">
+                
+                <!-- Background Decorations -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#1f4c4a 2px, transparent 2px); background-size: 24px 24px;"></div>
+                
+                <div class="absolute top-8 left-[55%] text-teal-100 opacity-60 text-6xl pointer-events-none transform -rotate-12">
+                    <i class="fa-regular fa-lightbulb"></i>
                 </div>
-                <div class="absolute right-1/3 top-2 text-teal-100 opacity-40 pointer-events-none">
-                    <i class="fa-solid fa-lightbulb text-7xl"></i>
+                <div class="absolute -bottom-6 left-[60%] text-teal-200 opacity-50 text-7xl pointer-events-none transform -rotate-12 translate-y-4">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <div class="absolute top-1/2 right-1/4 w-40 h-40 border-[3px] border-dotted border-teal-100 rounded-full opacity-50 pointer-events-none -translate-y-1/2"></div>
+                <div class="absolute -bottom-10 right-10 text-teal-100 opacity-70 text-6xl pointer-events-none transform rotate-12">
+                    <i class="fa-solid fa-star"></i>
                 </div>
 
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                    <div class="lg:col-span-8 space-y-3">
-                        <div class="flex flex-wrap items-center gap-3">
-                            <span class="tape-badge font-display font-extrabold text-xs text-amber-900 px-3 py-1 rounded-sm uppercase tracking-wider">
-                                Peace Education
-                            </span>
-                            <span class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 flex items-center gap-1.5">
-                                <i class="fa-solid fa-star text-amber-400"></i> 2026 3rd HWPL PEACE EDUCATION
-                            </span>
-                        </div>
-
-                        <h2 class="text-2xl md:text-4xl font-display font-black text-teal-900 tracking-tight leading-tight">
-                            2026 3rd HWPL PEACE EDUCATION<br class="hidden sm:inline"/> TRAINING
-                        </h2>
-
-                        <p class="text-teal-700 text-xs md:text-sm leading-relaxed max-w-2xl font-medium">
-                            Join HWPL's Peace Education Training! HWPL Peace Education Training educates teachers on HWPL peace textbook 12 lessons so that students can learn the value of peace through peace educators.
-                        </p>
+                <!-- Left Content -->
+                <div class="w-full md:w-[60%] lg:w-[65%] space-y-4 relative z-10">
+                    <div class="flex flex-wrap items-center gap-3 mb-2">
+                        <span class="bg-[#f6ea9d] text-amber-900 text-[11px] md:text-xs font-black px-3 py-1.5 rounded-sm uppercase tracking-wider transform -rotate-2 shadow-sm border border-amber-200/50">
+                            Peace Education
+                        </span>
+                        <span class="bg-white text-teal-800 text-[11px] md:text-xs font-bold px-3 py-1.5 rounded-full border border-teal-200 shadow-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-star text-amber-400"></i> 2026 3rd HWPL PEACE EDUCATION
+                        </span>
                     </div>
+                    
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-display font-black text-[#1a3b3a] leading-[1.15] tracking-tight drop-shadow-sm">
+                        2026 3rd HWPL PEACE EDUCATION<br>TRAINING
+                    </h2>
+                    
+                    <p class="text-teal-800 text-sm md:text-base leading-relaxed max-w-2xl font-medium mt-2">
+                        Join HWPL's Peace Education Training! HWPL Peace Education Training educates teachers on HWPL peace textbook 12 lessons so that students can learn the value of peace through peace educators.
+                    </p>
 
-                    <div class="lg:col-span-4 bg-teal-600 text-white p-5 rounded-2xl shadow-lg border-2 border-teal-500 flex flex-col justify-center items-center text-center space-y-2 relative transform hover:scale-[1.02] transition-transform">
-                        <div class="absolute -top-3 bg-tape text-teal-950 font-black text-[11px] px-3 py-0.5 rounded shadow-sm uppercase tracking-wider">
+                    <div class="pt-3 flex flex-wrap gap-3">
+                        <a href="https://app.notion.com/p/HWPL-Peace-Education-Guideline-3fca96517a74809bbcb5c27aa2d7d46e" target="_blank" rel="noopener noreferrer" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all items-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-book-open text-teal-200"></i> Peace Education Material
+                        </a>
+                        <!-- RSVP Button -->
+                        <a href="#rsvpSection" class="inline-flex bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all items-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-user-plus text-amber-100"></i> RSVP Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Content (Schedule Card) -->
+                <div class="w-full md:w-[40%] lg:w-[35%] relative z-10 flex justify-center md:justify-end mt-6 md:mt-0">
+                    <div class="bg-[#277572] text-white p-6 md:p-8 rounded-[1.5rem] shadow-xl border-4 border-white flex flex-col justify-center items-center text-center space-y-3 relative w-full max-w-sm transform hover:scale-[1.02] transition-transform">
+                        <!-- Overlapping Badge -->
+                        <div class="absolute -top-4 bg-[#f6ea9d] text-[#7a5c17] font-black text-[11px] md:text-xs px-4 py-1.5 rounded-md shadow uppercase tracking-widest border border-[#e5d482]">
                             SCHEDULE & TIME
                         </div>
-                        <div class="text-xl font-display font-black text-emerald-300 tracking-wide mt-1">
+                        
+                        <div class="text-2xl md:text-3xl font-display font-black text-[#6ee7b7] tracking-wide mt-2 drop-shadow-md">
                             NOV 7 – DEC 12
                         </div>
-                        <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-400/60 pb-2 w-full">
+                        <div class="text-xs font-extrabold uppercase tracking-widest text-teal-100 border-b border-teal-500/60 pb-3 w-full">
                             EVERY SATURDAY
                         </div>
-                        <div class="pt-1 text-xs space-y-0.5 font-semibold text-teal-50">
-                            <p>🌎 <strong class="text-white">ANTILLES:</strong> 8:30 AM</p>
-                            <p>🌍 <strong class="text-white">EUROPE & AFRICA:</strong> 2:30 PM</p>
+                        <div class="pt-2 text-xs md:text-sm space-y-1.5 font-semibold text-teal-50">
+                            <p class="flex items-center justify-center gap-1.5"><span class="text-base drop-shadow">🌎</span> <strong class="text-white">ANTILLES:</strong> 8:30 AM</p>
+                            <p class="flex items-center justify-center gap-1.5"><span class="text-base drop-shadow">🌍</span> <strong class="text-white">EUROPE & AFRICA:</strong> 2:30 PM</p>
                         </div>
                     </div>
                 </div>
@@ -830,7 +829,6 @@ function doGet(e) {
                 </div>
             </div>
 
-            <!-- 수료증 다운로드 섹션 -->
             <section class="bg-white p-6 md:p-8 rounded-3xl border-2 border-yellow-300 shadow-md space-y-4">
                 <h3 class="font-display font-extrabold text-yellow-900 text-xl flex items-center gap-2">
                     <i class="fa-solid fa-certificate text-yellow-500"></i> Certificate of Completion
@@ -903,6 +901,110 @@ function doGet(e) {
                 </form>
                 <div id="peaceMsgList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto pt-2"></div>
             </div>
+
+            <!-- ==================== 추가된 RSVP (사전 등록) 폼 섹션 ==================== -->
+            <section id="rsvpSection" class="bg-gradient-to-br from-teal-50 to-white rounded-3xl p-6 md:p-8 border-2 border-teal-300 shadow-lg space-y-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5 text-teal-900 pointer-events-none transform translate-x-4 -translate-y-4">
+                    <i class="fa-solid fa-envelope-open-text text-9xl"></i>
+                </div>
+                
+                <div class="flex items-center gap-3 border-b border-teal-200 pb-4 relative z-10">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">JOIN US</span>
+                            <h3 class="text-xl font-display font-black text-teal-950">RSVP for 2026 3rd Training</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Please fill out the form below to register for the upcoming Peace Education Training.</p>
+                    </div>
+                </div>
+
+                <form id="rsvpForm" onsubmit="handleRsvpSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">1. Full Name <span class="text-rose-500">*</span></label>
+                        <input type="text" id="rsvpName" required placeholder="Your Full Name" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">2. Gender <span class="text-rose-500">*</span></label>
+                        <select id="rsvpGender" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Gender...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">3. Country <span class="text-rose-500">*</span></label>
+                        <select id="rsvpCountry" required class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                            <option value="" disabled selected>Select Country...</option>
+                            <option value="Aruba">Aruba</option>
+                            <option value="Belgium">Belgium</option>
+                            <option value="Bonaire">Bonaire</option>
+                            <option value="China">China</option>
+                            <option value="Curaçao">Curaçao</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="India">India</option>
+                            <option value="Malawi">Malawi</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Sint Maarten">Sint Maarten</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Zambia">Zambia</option>
+                            <option value="Zimbabwe">Zimbabwe</option>
+                            <option value="Other">Other Country</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">4. School / Organization <span class="text-rose-500">*</span></label>
+                        <input type="text" id="rsvpSchool" required placeholder="e.g. St. Jude Peace Academy" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">5. Job / Position <span class="text-rose-500">*</span></label>
+                        <input type="text" id="rsvpJob" required placeholder="e.g. Teacher, Principal, Student" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">6. Contact Number <span class="text-rose-500">*</span></label>
+                        <input type="tel" id="rsvpPhone" required placeholder="+1 234 567 8900" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">7. Email <span class="text-rose-500">*</span></label>
+                        <input type="email" id="rsvpEmail" required placeholder="your.email@example.com" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">8. Referrer <span class="text-rose-500">*</span></label>
+                        <input type="text" id="rsvpReferrer" required placeholder="Who invited you?" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-white">
+                    </div>
+
+                    <!-- Privacy Consent -->
+                    <div class="md:col-span-2 lg:col-span-3 mt-2 bg-teal-50 border border-teal-100 p-4 rounded-xl">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="rsvpConsent" required class="mt-1 w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                            <span class="text-xs text-slate-600 leading-relaxed">
+                                <strong class="text-slate-800">Privacy Policy Consent <span class="text-rose-500">*</span></strong><br>
+                                I agree to the collection and use of my personal information for the purpose of participating in the HWPL Peace Education Training, receiving updates, and managing attendance.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3 pt-2">
+                        <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-paper-plane text-teal-200"></i> Submit RSVP Registration
+                        </button>
+                    </div>
+                </form>
+            </section>
+            <!-- ========================================================================= -->
+
         </div>
 
         <div id="adminView" class="hidden space-y-6">
@@ -1222,7 +1324,7 @@ function doGet(e) {
             }
         });
 
-        // 초기 목업 데이터
+        // 초기 목업 데이터에 rsvp 항목 추가
         let appData = {
             attendance: JSON.parse(localStorage.getItem('hwpl_attendance') || JSON.stringify([
                 { name: 'Maria Santos', country: 'Aruba', school: 'St. Jude Peace Academy', position: 'Teacher', year: '2026', session: 'Sess 1', timestamp: getFormattedEnglishTimestamp() },
@@ -1233,7 +1335,8 @@ function doGet(e) {
             ])),
             missions: JSON.parse(localStorage.getItem('hwpl_missions') || '[]'),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || '[]'),
-            peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || '[]')
+            peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || '[]'),
+            rsvp: JSON.parse(localStorage.getItem('hwpl_rsvp') || '[]')
         };
 
         let currentAdminTab = 'attendance';
@@ -1245,6 +1348,7 @@ function doGet(e) {
             localStorage.setItem('hwpl_missions', JSON.stringify(appData.missions));
             localStorage.setItem('hwpl_qna', JSON.stringify(appData.qna));
             localStorage.setItem('hwpl_peaceMsg', JSON.stringify(appData.peaceMsg));
+            localStorage.setItem('hwpl_rsvp', JSON.stringify(appData.rsvp));
         }
 
         async function fetchGoogleSheetData() {
@@ -1379,9 +1483,18 @@ function doGet(e) {
         }
 
         async function syncAndRefreshAfterSubmit(payload) {
-            const key = payload.type === 'attendance' ? 'attendance' : payload.type === 'mission' ? 'missions' : payload.type === 'qna' ? 'qna' : 'peaceMsg';
-            appData[key].unshift(payload);
-            saveToLocalStorage();
+            let key = '';
+            if (payload.type === 'attendance') key = 'attendance';
+            else if (payload.type === 'mission') key = 'missions';
+            else if (payload.type === 'qna') key = 'qna';
+            else if (payload.type === 'peaceMsg') key = 'peaceMsg';
+            else if (payload.type === 'rsvp') key = 'rsvp';
+
+            if (key) {
+                if (!appData[key]) appData[key] = [];
+                appData[key].unshift(payload);
+                saveToLocalStorage();
+            }
 
             await sendDataToGoogleSheet(payload);
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1489,6 +1602,52 @@ function doGet(e) {
             }
         }
 
+        // RSVP 폼 제출 핸들러
+        async function handleRsvpSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                type: 'rsvp',
+                name: document.getElementById('rsvpName').value.trim(),
+                gender: document.getElementById('rsvpGender').value,
+                country: document.getElementById('rsvpCountry').value,
+                school: document.getElementById('rsvpSchool').value.trim(),
+                job: document.getElementById('rsvpJob').value.trim(),
+                phone: document.getElementById('rsvpPhone').value.trim(),
+                email: document.getElementById('rsvpEmail').value.trim(),
+                referrer: document.getElementById('rsvpReferrer').value.trim(),
+                consent: document.getElementById('rsvpConsent').checked ? 'Agree' : 'Disagree',
+                timestamp: getFormattedEnglishTimestamp()
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                // 구글 시트에 "rsvp" 타입으로 전송 (Code.gs에서 지원하도록 구조체 동일)
+                await syncAndRefreshAfterSubmit({
+                    type: 'rsvp',
+                    name: formData.name,
+                    country: formData.country,
+                    school: formData.school,
+                    position: formData.job, // 직업 -> position 매핑
+                    session: `Gender: ${formData.gender}`, // session 위치에 성별 기록
+                    content: `Email: ${formData.email} | Phone: ${formData.phone}`, // content 위치에 연락처 기록
+                    reflection: `Referrer: ${formData.referrer} | Consent: ${formData.consent}`, // reflection 위치에 추천인/동의 기록
+                    timestamp: formData.timestamp
+                });
+                showToast('RSVP submitted successfully!', 'success');
+                document.getElementById('rsvpForm').reset();
+            } catch (error) {
+                showToast('RSVP recorded locally!', 'success');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         // ============================================
         // 수료증(Certificate) 로직 추가 영역
         // ============================================
@@ -1568,7 +1727,6 @@ function doGet(e) {
             }).join('');
         }
 
-        // [수정] 상대 경로 인식을 명확히 하기 위해 "./"를 제거하고 파일명만 입력합니다.
         const PERMANENT_CERT_BG_URL = "Certificate_PE.png";
         // ============================================
 
