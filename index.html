@@ -1157,44 +1157,19 @@ function doGet(e) {
 
     <!-- 수료증 렌더링용 숨겨진 템플릿 (화면 밖으로 배치하여 사용자는 보지 못하게 함) -->
     <div id="certificateTemplateWrapper" style="position: absolute; left: -9999px; top: -9999px;">
-        <div id="certificateTemplate" class="w-[850px] h-[600px] bg-white relative overflow-hidden flex flex-col justify-center items-center text-center font-serif shadow-2xl">
+        <div id="certificateTemplate" class="w-[850px] h-[600px] bg-white relative overflow-hidden text-center shadow-2xl">
             <!-- Github에 업로드된 수료증 배경 이미지 적용 -->
             <img src="Certificate_PE.png" alt="Certificate Background" class="absolute inset-0 w-full h-full object-cover z-0" crossorigin="anonymous" />
             
-            <div class="relative z-10 space-y-6 w-full flex flex-col items-center p-12">
-                <div>
-                    <h1 class="text-5xl font-black text-yellow-800 tracking-[0.2em] mb-1 drop-shadow-sm">CERTIFICATE</h1>
-                    <h2 class="text-xl font-medium text-slate-800 uppercase tracking-[0.3em]">of Completion</h2>
-                </div>
+            <!-- 배경 이미지에 이미 텍스트가 있으므로, HTML에서는 오직 '이름'과 '학교'만 절대 위치로 오버레이 합니다. -->
+            <div class="relative z-10 w-full h-full">
+                <!-- 수료자 이름 렌더링 (위에서부터 약 44% 지점에 배치) -->
+                <h3 id="renderCertName" class="absolute w-full text-center text-[38px] font-bold text-slate-900 font-sans tracking-wide" style="top: 44%;">Name Placeholder</h3>
                 
-                <div class="w-24 h-1.5 bg-yellow-500 rounded-full my-2"></div>
-                
-                <p class="text-sm text-slate-700 uppercase tracking-widest font-semibold mt-4">This is proudly presented to</p>
-                
-                <h3 id="renderCertName" class="text-4xl font-bold text-slate-900 border-b-2 border-yellow-600/50 pb-2 inline-block min-w-[350px] font-sans drop-shadow-sm">Name Placeholder</h3>
-                
-                <p class="text-sm text-slate-700 mt-2">from <span id="renderCertSchool" class="font-bold text-slate-900 text-base drop-shadow-sm">School Placeholder</span></p>
-                
-                <p class="text-sm text-slate-800 max-w-xl mx-auto leading-relaxed mt-6 italic bg-white/60 p-2 rounded backdrop-blur-sm shadow-sm">
-                    For successfully completing the <strong>2026 2nd HWPL Peace Education Training</strong>.<br> We commend your dedication to fostering a culture of peace and empowering future generations around the world.
+                <!-- 소속 학교/기관 렌더링 (위에서부터 약 55% 지점에 배치) -->
+                <p class="absolute w-full text-center text-[22px] text-slate-800 font-serif" style="top: 55%;">
+                    <span class="italic mr-1 text-slate-600">from</span> <span id="renderCertSchool" class="font-bold text-slate-900">School Placeholder</span>
                 </p>
-                
-                <div class="flex justify-between items-end w-full px-16 mt-10">
-                    <div class="text-center border-t border-slate-500 pt-2 w-40 bg-white/70 backdrop-blur-sm rounded-lg pb-1 shadow-sm">
-                        <p class="text-sm font-bold text-slate-900 drop-shadow-sm" id="renderCertDate">Sept 5, 2026</p>
-                        <p class="text-[10px] text-slate-600 uppercase mt-1 tracking-wider">Date of Issue</p>
-                    </div>
-                    
-                    <div class="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center border-[5px] border-yellow-600 relative shadow-md">
-                        <i class="fa-solid fa-dove text-4xl text-yellow-700"></i>
-                        <div class="absolute inset-0 border-2 border-dashed border-yellow-700 rounded-full m-1"></div>
-                    </div>
-                    
-                    <div class="text-center border-t border-slate-500 pt-2 w-40 bg-white/70 backdrop-blur-sm rounded-lg pb-1 shadow-sm">
-                        <p class="text-2xl font-bold text-slate-900 font-signature leading-none drop-shadow-sm">HWPL</p>
-                        <p class="text-[10px] text-slate-600 uppercase mt-2 tracking-wider">Signature</p>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
