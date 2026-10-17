@@ -100,7 +100,8 @@
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <!-- 처음 로딩 시 바로 보이도록 hidden 클래스 제거 -->
+    <div id="siteGateModal" class="fixed inset-0 bg-teal-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-5 transform transition-all">
             <div>
                 <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider">Restricted Access</span>
@@ -109,14 +110,13 @@
             </div>
             <form onsubmit="verifySitePasscode(event)" class="space-y-3">
                 <div>
+                    <!-- 비밀번호 입력칸 -->
                     <input type="password" id="sitePasscodeInput" required placeholder="Access Code" class="w-full text-center px-4 py-3 border border-slate-300 rounded-xl text-base font-bold tracking-widest focus:ring-2 focus:ring-teal-500 focus:outline-none">
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="w-2/3 bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
+                    <!-- Quick Bypass 버튼 삭제 및 Enter Portal 버튼을 100% 너비(w-full)로 수정 -->
+                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-key"></i> Enter Portal
-                    </button>
-                    <button type="button" onclick="bypassSiteGate()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all border border-slate-200">
-                        Quick Bypass
                     </button>
                 </div>
             </form>
@@ -167,7 +167,12 @@
     data.position || '',
     data.session || data.week || '',
     data.content || '',
-    data.reflection || ''
+    data.reflection || '',
+    data.gender || '',     // J열: 성별 (RSVP)
+    data.email || '',      // K열: 이메일 (RSVP)
+    data.phone || '',      // L열: 연락처 (RSVP)
+    data.referrer || '',   // M열: 추천인 (RSVP)
+    data.consent || ''     // N열: 개인정보동의 (RSVP)
   ]);
   return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
 }
@@ -177,7 +182,7 @@ function doGet(e) {
   var sheet = ss.getActiveSheet();
   var rows = sheet.getDataRange().getValues();
   var result = [];
-  for (var i = 1; i &lt; rows.length; i++) {
+  for (var i = 1; i < rows.length; i++) {
     var row = rows[i];
     if (row[0] || row[2]) {
       result.push({
@@ -190,7 +195,12 @@ function doGet(e) {
         session: row[6],
         week: row[6],
         content: row[7],
-        reflection: row[8]
+        reflection: row[8],
+        gender: row[9] || '',
+        email: row[10] || '',
+        phone: row[11] || '',
+        referrer: row[12] || '',
+        consent: row[13] || ''
       });
     }
   }
@@ -1018,6 +1028,7 @@ function doGet(e) {
                     <button onclick="refreshAdminData()" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
                         <i class="fa-solid fa-rotate"></i> Sync & Refresh Data
                     </button>
+                    <!-- 누락되었던 Integration Guide 및 Export 버튼 복구 -->
                     <button onclick="openAppsScriptGuide()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all flex items-center gap-2">
                         <i class="fa-solid fa-code"></i> Integration Guide
                     </button>
@@ -1027,7 +1038,7 @@ function doGet(e) {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-white p-5 rounded-2xl border border-teal-100 shadow-sm flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center text-xl font-bold">
                         <i class="fa-solid fa-users"></i>
@@ -1046,12 +1057,21 @@ function doGet(e) {
                         <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalMissions">0</h3>
                     </div>
                 </div>
+                <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Total RSVPs</p>
+                        <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalRsvps">0</h3>
+                    </div>
+                </div>
                 <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl font-bold">
                         <i class="fa-solid fa-globe"></i>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Countries Reached</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Countries</p>
                         <h3 class="text-2xl font-display font-black text-slate-900" id="statTotalCountries">0</h3>
                     </div>
                 </div>
@@ -1083,9 +1103,10 @@ function doGet(e) {
 
             <div class="bg-white rounded-3xl border border-teal-100 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <button id="tabAttendanceBtn" onclick="switchAdminTab('attendance')" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all">Attendance Records</button>
                         <button id="tabMissionsBtn" onclick="switchAdminTab('missions')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Mission Submissions</button>
+                        <button id="tabRsvpBtn" onclick="switchAdminTab('rsvp')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">RSVP Records</button>
                     </div>
                     <div class="flex flex-wrap gap-2 w-full lg:w-auto">
                         <div class="w-full sm:w-44">
@@ -1196,7 +1217,7 @@ function doGet(e) {
     </div>
 
     <script> 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynymQgGAZ-LMwcIUXgosBonlPkAasmqv6sPWDp-Qg0sxND_wig7qL4BuBiM4xCYcny5w/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzheI3nY8OyYdX3UaWP-Pm5z9i8cY2n0arvpHKxJPePiXWroYTYltiSd1mrMQtoexiv/exec';
 
         function getFormattedEnglishTimestamp() {
             return new Date().toLocaleString('en-US', {
@@ -1360,6 +1381,7 @@ function doGet(e) {
                     const fetchedMissions = [];
                     const fetchedQna = [];
                     const fetchedPeaceMsg = [];
+                    const fetchedRsvp = [];
                     data.forEach(item => {
                         if (item.type === 'attendance') {
                             fetchedAttendance.push(item);
@@ -1371,12 +1393,15 @@ function doGet(e) {
                             fetchedQna.push({ name: item.name, country: item.country, content: item.content, timestamp: item.timestamp, replies: replies });
                         } else if (item.type === 'peaceMsg') {
                             fetchedPeaceMsg.push(item);
+                        } else if (item.type === 'rsvp') {
+                            fetchedRsvp.push(item);
                         }
                     });
                     if (fetchedAttendance.length > 0) appData.attendance = fetchedAttendance;
                     if (fetchedMissions.length > 0) appData.missions = fetchedMissions;
                     if (fetchedQna.length > 0) appData.qna = fetchedQna;
                     if (fetchedPeaceMsg.length > 0) appData.peaceMsg = fetchedPeaceMsg;
+                    if (fetchedRsvp.length > 0) appData.rsvp = fetchedRsvp;
                     saveToLocalStorage();
                     renderQnaList();
                     renderPeaceMsgList();
@@ -1626,16 +1651,21 @@ function doGet(e) {
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
 
             try {
-                // 구글 시트에 "rsvp" 타입으로 전송 (Code.gs에서 지원하도록 구조체 동일)
+                // 구글 시트에 "rsvp" 타입으로 전송 (분리된 칼럼 사용)
                 await syncAndRefreshAfterSubmit({
                     type: 'rsvp',
                     name: formData.name,
                     country: formData.country,
                     school: formData.school,
-                    position: formData.job, // 직업 -> position 매핑
-                    session: `Gender: ${formData.gender}`, // session 위치에 성별 기록
-                    content: `Email: ${formData.email} | Phone: ${formData.phone}`, // content 위치에 연락처 기록
-                    reflection: `Referrer: ${formData.referrer} | Consent: ${formData.consent}`, // reflection 위치에 추천인/동의 기록
+                    position: formData.job, 
+                    session: '2026 3rd Cohort', // 3기 RSVP임을 명확히 표기
+                    content: '', 
+                    reflection: '', 
+                    gender: formData.gender,     // 새 칼럼(J열)
+                    email: formData.email,       // 새 칼럼(K열)
+                    phone: formData.phone,       // 새 칼럼(L열)
+                    referrer: formData.referrer, // 새 칼럼(M열)
+                    consent: formData.consent,   // 새 칼럼(N열)
                     timestamp: formData.timestamp
                 });
                 showToast('RSVP submitted successfully!', 'success');
@@ -1961,10 +1991,12 @@ function doGet(e) {
 
             let filteredAtt = appData.attendance;
             let filteredMis = appData.missions;
+            let filteredRsvp = appData.rsvp || [];
 
             if (cohortFilter) {
                 filteredAtt = filteredAtt.filter(a => getCohort(a.session) === cohortFilter);
                 filteredMis = filteredMis.filter(m => getCohort(m.week) === cohortFilter);
+                filteredRsvp = filteredRsvp.filter(r => getCohort(r.session) === cohortFilter);
             }
             if (yearFilter) {
                 filteredAtt = filteredAtt.filter(a => a.year === yearFilter);
@@ -1973,11 +2005,12 @@ function doGet(e) {
 
             document.getElementById('statTotalAttendance').textContent = filteredAtt.length;
             document.getElementById('statTotalMissions').textContent = filteredMis.length;
+            document.getElementById('statTotalRsvps').textContent = filteredRsvp.length;
 
-            const countries = new Set([...filteredAtt.map(a => a.country), ...filteredMis.map(m => m.country)]);
+            const countries = new Set([...filteredAtt.map(a => a.country), ...filteredMis.map(m => m.country), ...filteredRsvp.map(r => r.country)]);
             document.getElementById('statTotalCountries').textContent = countries.size;
 
-            const schools = new Set([...filteredAtt.map(a => a.school), ...filteredMis.map(m => m.school)]);
+            const schools = new Set([...filteredAtt.map(a => a.school), ...filteredMis.map(m => m.school), ...filteredRsvp.map(r => r.school)]);
             document.getElementById('statTotalSchools').textContent = schools.size;
 
             renderCharts(filteredAtt, filteredMis);
@@ -1988,11 +2021,17 @@ function doGet(e) {
             currentAdminTab = tab;
             const btnAtt = document.getElementById('tabAttendanceBtn');
             const btnMis = document.getElementById('tabMissionsBtn');
+            const btnRsvp = document.getElementById('tabRsvpBtn');
             const header = document.getElementById('adminTableHeader');
 
+            const activeClass = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
+            const inactiveClass = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
+
+            btnAtt.className = tab === 'attendance' ? activeClass : inactiveClass;
+            btnMis.className = tab === 'missions' ? activeClass : inactiveClass;
+            btnRsvp.className = tab === 'rsvp' ? activeClass : inactiveClass;
+
             if (tab === 'attendance') {
-                btnAtt.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
-                btnMis.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
                 header.innerHTML = `
                     <th class="p-4 w-12">No.</th>
                     <th class="p-4">Name</th>
@@ -2003,9 +2042,7 @@ function doGet(e) {
                     <th class="p-4">Timestamp</th>
                     <th class="p-4 text-center">Action</th>
                 `;
-            } else {
-                btnMis.className = "px-4 py-2 rounded-xl text-xs font-bold bg-teal-700 text-white shadow-sm transition-all";
-                btnAtt.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all";
+            } else if (tab === 'missions') {
                 header.innerHTML = `
                     <th class="p-4 w-12">No.</th>
                     <th class="p-4">Name</th>
@@ -2015,6 +2052,17 @@ function doGet(e) {
                     <th class="p-4">Mission</th>
                     <th class="p-4">Target & Date</th>
                     <th class="p-4">Contents</th>
+                    <th class="p-4">Timestamp</th>
+                    <th class="p-4 text-center">Action</th>
+                `;
+            } else if (tab === 'rsvp') {
+                header.innerHTML = `
+                    <th class="p-4 w-12">No.</th>
+                    <th class="p-4">Name / Gender</th>
+                    <th class="p-4">Country</th>
+                    <th class="p-4">School / Job</th>
+                    <th class="p-4">Contact Info</th>
+                    <th class="p-4">Referrer</th>
                     <th class="p-4">Timestamp</th>
                     <th class="p-4 text-center">Action</th>
                 `;
@@ -2062,44 +2110,44 @@ function doGet(e) {
                         </td>
                     </tr>
                 `).join('');
-            } else {
-                const filteredWithIndices = appData.missions.map((m, idx) => ({ item: m, index: idx })).filter(({ item: m }) => {
-                    const matchesSearch = (m.name || '').toLowerCase().includes(search) || 
-                        (m.country || '').toLowerCase().includes(search) || 
-                        (m.school || '').toLowerCase().includes(search) || 
-                        (m.week || '').toLowerCase().includes(search) ||
-                        (m.content || '').toLowerCase().includes(search) ||
-                        (m.target || '').toLowerCase().includes(search);
-                    const matchesYear = !yearFilter || m.year === yearFilter;
-                    const matchesCohort = !cohortFilter || getCohort(m.week) === cohortFilter;
-                    return matchesSearch && matchesYear && matchesCohort;
+            } else if (currentAdminTab === 'rsvp') {
+                const filteredWithIndices = (appData.rsvp || []).map((r, idx) => ({ item: r, index: idx })).filter(({ item: r }) => {
+                    const matchesSearch = (r.name || '').toLowerCase().includes(search) || 
+                        (r.country || '').toLowerCase().includes(search) || 
+                        (r.school || '').toLowerCase().includes(search) ||
+                        (r.email || '').toLowerCase().includes(search) ||
+                        (r.phone || '').toLowerCase().includes(search);
+                    const matchesCohort = !cohortFilter || getCohort(r.session) === cohortFilter;
+                    return matchesSearch && matchesCohort;
                 });
 
                 if (filteredWithIndices.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-slate-400">No mission submissions found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No RSVP records found.</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = filteredWithIndices.map(({ item: m, index: idx }, displayIdx) => `
+                tbody.innerHTML = filteredWithIndices.map(({ item: r, index: idx }, displayIdx) => `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-4 text-slate-500 font-bold">${displayIdx + 1}</td>
-                        <td class="p-4 font-bold text-slate-900">${m.name || ''}</td>
-                        <td class="p-4">${m.country || ''}</td>
-                        <td class="p-4">${m.school || ''}</td>
-                        <td class="p-4"><span class="bg-amber-50 text-amber-900 px-2 py-0.5 rounded font-semibold">${m.position || 'N/A'}</span></td>
-                        <td class="p-4 font-semibold text-amber-950">${m.week || ''}</td>
                         <td class="p-4">
-                            <div class="space-y-0.5">
-                                <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded inline-block">${m.target || 'N/A'} (${m.count || '0'})</span>
-                                <p class="text-[10px] text-slate-400"><i class="fa-solid fa-calendar mr-1"></i>${m.date || 'N/A'}</p>
+                            <strong class="text-slate-900">${r.name || ''}</strong><br>
+                            <span class="text-[10px] text-slate-500">${r.gender || ''}</span>
+                        </td>
+                        <td class="p-4">${r.country || ''}</td>
+                        <td class="p-4">
+                            <strong class="text-slate-800">${r.school || ''}</strong><br>
+                            <span class="text-[10px] text-slate-500">${r.position || ''}</span>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-[11px] text-slate-600">
+                                <i class="fa-solid fa-envelope mr-1 text-slate-400"></i>${r.email || 'N/A'}<br>
+                                <i class="fa-solid fa-phone mr-1 text-slate-400"></i>${r.phone || 'N/A'}
                             </div>
                         </td>
-                        <td class="p-4">
-                            <p class="max-w-xs truncate text-slate-700 whitespace-pre-line" title="${m.content || ''}">${m.content || ''}</p>
-                        </td>
-                        <td class="p-4 text-slate-400 text-[11px]">${m.timestamp || ''}</td>
+                        <td class="p-4 text-[11px] font-semibold text-slate-700">${r.referrer || 'N/A'}</td>
+                        <td class="p-4 text-slate-400 text-[11px]">${r.timestamp || ''}</td>
                         <td class="p-4 text-center">
-                            <button onclick="deleteRecord('missions', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
+                            <button onclick="deleteRecord('rsvp', ${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-lg transition-all" title="Delete Record">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
@@ -2113,6 +2161,8 @@ function doGet(e) {
                 appData.attendance.splice(index, 1);
             } else if (type === 'missions') {
                 appData.missions.splice(index, 1);
+            } else if (type === 'rsvp') {
+                appData.rsvp.splice(index, 1);
             }
             saveToLocalStorage();
             renderAdminDashboard();
@@ -2142,13 +2192,20 @@ function doGet(e) {
                     if (yearFilter && a.year !== yearFilter) return;
                     csvContent += `"${count++}","${a.name || ''}","${a.country || ''}","${a.school || ''}","${a.position || ''}","${a.year || ''}","${a.session || ''}","${a.timestamp || ''}"\n`;
                 });
-            } else {
+            } else if (currentAdminTab === 'missions') {
                 csvContent += "No,Name,Country,School,Position,Year,Mission,Date,Target,Count,Content,Timestamp\n";
                 let count = 1;
                 appData.missions.forEach((m) => {
                     if (cohortFilter && getCohort(m.week) !== cohortFilter) return;
                     if (yearFilter && m.year !== yearFilter) return;
                     csvContent += `"${count++}","${m.name || ''}","${m.country || ''}","${m.school || ''}","${m.position || ''}","${m.year || ''}","${m.week || ''}","${m.date || ''}","${m.target || ''}","${m.count || ''}","${(m.content || '').replace(/"/g, '""')}","${m.timestamp || ''}"\n`;
+                });
+            } else if (currentAdminTab === 'rsvp') {
+                csvContent += "No,Name,Gender,Country,School,Job_Position,Phone,Email,Referrer,Consent,Timestamp\n";
+                let count = 1;
+                (appData.rsvp || []).forEach((r) => {
+                    if (cohortFilter && getCohort(r.session) !== cohortFilter) return;
+                    csvContent += `"${count++}","${r.name || ''}","${r.gender || ''}","${r.country || ''}","${r.school || ''}","${r.position || ''}","${r.phone || ''}","${r.email || ''}","${r.referrer || ''}","${r.consent || ''}","${r.timestamp || ''}"\n`;
                 });
             }
             const encodedUri = encodeURI(csvContent);
