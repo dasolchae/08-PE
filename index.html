@@ -1176,7 +1176,7 @@ function doGet(e) {
 
     <script> 
         // 새롭게 배포된 구글 앱스 스크립트 웹앱 URL입니다.
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfmceCICTq5RwPNY8brmGfvrVf16xiKOcJitzFj7AtqYpU4lI2naaIN3S0Lhst3MJNCg/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzheI3nY8OyYdX3UaWP-Pm5z9i8cY2n0arvpHKxJPePiXWroYTYltiSd1mrMQtoexiv/exec';
 
         function getFormattedEnglishTimestamp() {
             return new Date().toLocaleString('en-US', {
@@ -1311,8 +1311,7 @@ function doGet(e) {
             missions: JSON.parse(localStorage.getItem('hwpl_missions') || '[]'),
             qna: JSON.parse(localStorage.getItem('hwpl_qna') || '[]'),
             peaceMsg: JSON.parse(localStorage.getItem('hwpl_peaceMsg') || '[]'),
-            rsvp: JSON.parse(localStorage.getItem('hwpl_rsvp') || '[]'),
-            officialCert: JSON.parse(localStorage.getItem('hwpl_officialCert') || '[]')
+            rsvp: JSON.parse(localStorage.getItem('hwpl_rsvp') || '[]')
         };
 
         let currentAdminTab = 'attendance';
@@ -1325,20 +1324,18 @@ function doGet(e) {
             localStorage.setItem('hwpl_qna', JSON.stringify(appData.qna));
             localStorage.setItem('hwpl_peaceMsg', JSON.stringify(appData.peaceMsg));
             localStorage.setItem('hwpl_rsvp', JSON.stringify(appData.rsvp));
-            localStorage.setItem('hwpl_officialCert', JSON.stringify(appData.officialCert || []));
         }
 
         async function fetchGoogleSheetData() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
-                if (Array.isArray(data)) {
+                if (Array.isArray(data) && data.length > 0) {
                     const fetchedAttendance = [];
                     const fetchedMissions = [];
                     const fetchedQna = [];
                     const fetchedPeaceMsg = [];
                     const fetchedRsvp = [];
-                    const fetchedOfficialCert = [];
                     
                     data.forEach(item => {
                         if (item.type === 'attendance') {
@@ -1353,8 +1350,6 @@ function doGet(e) {
                             fetchedPeaceMsg.push(item);
                         } else if (item.type === 'rsvp') {
                             fetchedRsvp.push(item);
-                        } else if (item.type === 'official_cert_data') {
-                            fetchedOfficialCert.push(item);
                         }
                     });
                     
@@ -1363,9 +1358,6 @@ function doGet(e) {
                     if (fetchedQna.length > 0) appData.qna = fetchedQna;
                     if (fetchedPeaceMsg.length > 0) appData.peaceMsg = fetchedPeaceMsg;
                     if (fetchedRsvp.length > 0) appData.rsvp = fetchedRsvp;
-                    
-                    // 공식 수료증 데이터는 빈 배열이어도 무조건 최신 데이터로 덮어쓰도록 수정
-                    appData.officialCert = fetchedOfficialCert;
                     
                     saveToLocalStorage();
                     renderQnaList();
@@ -1635,114 +1627,87 @@ function doGet(e) {
             }
         }
 
-// ============================================
-        // 수료증(Certificate) 로직 (초강력 유연 검색 적용 및 문법 에러 수정 완료)
+        // ============================================
+        // 수료증(Certificate) 로직
         // ============================================
         async function handleCertCheck(e) {
             e.preventDefault();
-            const searchName = document.getElementById('certName').value.trim().toLowerCase();
-            const searchCountry = document.getElementById('certCountry').value.trim().toLowerCase();
-            const searchSchool = document.getElementById('certSchool').value.trim().toLowerCase();
-
-            const normalizeStr = str => str.toLowerCase().replace(/[^a-z0-9가-힣]/gi, '');
-            const normSearchName = normalizeStr(searchName);
-            const normSearchSchool = normalizeStr(searchSchool);
-            const normSearchCountry = normalizeStr(searchCountry);
-
+            const name = document.getElementById('certName').value.trim().toLowerCase();
+            const country = document.getElementById('certCountry').value;
+            const school = document.getElementById('certSchool').value.trim().toLowerCase();
+            
+            const matchingAtt = appData.attendance.filter(a => 
+                (a.name || '').toLowerCase().includes(name) && 
+                a.country === country && 
+                (a.school || '').toLowerCase().includes(school)
+            );
+            
             const container = document.getElementById('certResultContainer');
             container.classList.remove('hidden');
 
-            if (!appData.officialCert || appData.officialCert.length === 0) {
-                container.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl"><p class="text-amber-800 text-sm font-bold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Official data is still loading or not available. Please refresh and try again.</p></div>`;
-                return;
-            }
-
-            const match = appData.officialCert.find(c => {
-                let cName = "";
-                let cSchool = "";
-                let cCountry = "";
-
-                for (const key in c) {
-                    if (key.includes('name')) cName += c[key] + " ";
-                    if (key.includes('school') || key.includes('org') || key.includes('institute')) cSchool += c[key] + " ";
-                    if (key.includes('country')) cCountry += c[key] + " ";
-                }
-
-                cName = normalizeStr(cName);
-                cSchool = normalizeStr(cSchool);
-                cCountry = normalizeStr(cCountry);
-
-                // 이름과 학교가 포함되어 있고, 국가명도 서로 포함 관계면 무조건 통과
-                return cName.includes(normSearchName) && cSchool.includes(normSearchSchool) && (cCountry.includes(normSearchCountry) || normSearchCountry.includes(cCountry));
-            });
-
-            if (!match) {
+            if (matchingAtt.length === 0) {
                 container.innerHTML = `
                     <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl">
                         <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
-                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> No Official Record Found
+                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> No Records Found
                         </h4>
                         <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
-                            Could not find any official attendance records matching your search in the admin database. Please check your spelling.
+                            Could not find any attendance records matching your search.
                         </p>
                     </div>
                 `;
                 return;
             }
 
-            // 총 출석 횟수 추출
-            let total = 0;
-            for (const key in match) {
-                if (key.includes('total') || key.includes('session') || key.includes('attend') || key.includes('count')) {
-                    const val = parseInt(match[key], 10);
-                    if (!isNaN(val) && val > total) total = val;
+            const usersMap = {};
+            matchingAtt.forEach(a => {
+                const normName = (a.name || '').trim().toLowerCase();
+                const normSchool = (a.school || '').trim().toLowerCase();
+                const key = `${normName}|${a.country}|${normSchool}`;
+                
+                if (!usersMap[key]) {
+                    usersMap[key] = { name: (a.name || '').trim(), school: (a.school || '').trim(), count: 0 };
                 }
-            }
-            
-            // 수료증 렌더링에 사용될 깔끔한 이름/학교 추출
-            let displaySafeName = searchName;
-            let displaySafeSchool = searchSchool;
-            for (const key in match) {
-                if (key.includes('name') && match[key]) { displaySafeName = String(match[key]).replace(/'/g, "\\'"); break; }
-            }
-            for (const key in match) {
-                if ((key.includes('school') || key.includes('org')) && match[key]) { displaySafeSchool = String(match[key]).replace(/'/g, "\\'"); break; }
-            }
+                usersMap[key].count++;
+            });
 
-            // 4회 이상 출석 여부 판별 및 UI 출력
-            if (total >= 4) {
-                container.innerHTML = `
-                    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-3">
-                        <div>
-                            <h4 class="text-emerald-900 font-bold text-base flex items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Congratulations!
+            const users = Object.values(usersMap);
+            
+            container.innerHTML = users.map(u => {
+                if (u.count >= 4) {
+                    const safeName = u.name.replace(/'/g, "\\'");
+                    const safeSchool = u.school.replace(/'/g, "\\'");
+                    return `
+                        <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-3">
+                            <div>
+                                <h4 class="text-emerald-900 font-bold text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Eligible: ${u.name}
+                                </h4>
+                                <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
+                                    Total Attendance: <strong>${u.count}</strong><br>
+                                    You are officially eligible for the Certificate of Completion.
+                                </p>
+                            </div>
+                            <button type="button" onclick="downloadCertificate(event, '${safeName}', '${safeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
+                                <i class="fa-solid fa-file-pdf"></i> Download
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl mb-3">
+                            <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
+                                <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible: ${u.name}
                             </h4>
-                            <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-                                Official Verified Sessions: <strong>${total}</strong><br>
-                                <strong>Congratulations on your completion!</strong> You are now eligible to download your certificate.
+                            <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
+                                You currently have <strong>${u.count}</strong> attendance record(s). You need at least <strong>4 records</strong> to generate the certificate.
                             </p>
                         </div>
-                        <button type="button" onclick="downloadCertificate(event, '${displaySafeName}', '${displaySafeSchool}')" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition-all whitespace-nowrap">
-                            <i class="fa-solid fa-file-pdf"></i> Download
-                        </button>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl mb-3">
-                        <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
-                            <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Certificate Not Available
-                        </h4>
-                        <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
-                            Official Verified Sessions: <strong>${total}</strong><br>
-                            <strong>Unfortunately, you did not meet the requirements for completion this time.</strong><br>
-                            Thank you for your hard work and dedication!
-                        </p>
-                    </div>
-                `;
-            }
+                    `;
+                }
+            }).join('');
         }
-        
+
         async function downloadCertificate(event, name, school) {
             try {
                 const btn = event.currentTarget;
