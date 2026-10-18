@@ -1332,7 +1332,7 @@ function doGet(e) {
             try {
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
+                if (Array.isArray(data)) {
                     const fetchedAttendance = [];
                     const fetchedMissions = [];
                     const fetchedQna = [];
@@ -1363,7 +1363,9 @@ function doGet(e) {
                     if (fetchedQna.length > 0) appData.qna = fetchedQna;
                     if (fetchedPeaceMsg.length > 0) appData.peaceMsg = fetchedPeaceMsg;
                     if (fetchedRsvp.length > 0) appData.rsvp = fetchedRsvp;
-                    if (fetchedOfficialCert.length > 0) appData.officialCert = fetchedOfficialCert;
+                    
+                    // 공식 수료증 데이터는 빈 배열이어도 무조건 최신 데이터로 덮어쓰도록 수정
+                    appData.officialCert = fetchedOfficialCert;
                     
                     saveToLocalStorage();
                     renderQnaList();
