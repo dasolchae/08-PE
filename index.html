@@ -1666,15 +1666,26 @@ function doGet(e) {
                 const key = `${normName}|${a.country}|${normSchool}`;
                 
                 if (!usersMap[key]) {
-                    usersMap[key] = { name: (a.name || '').trim(), school: (a.school || '').trim(), count: 0 };
+                    usersMap[key] = { 
+                        name: (a.name || '').trim(), 
+                        school: (a.school || '').trim(), 
+                        uniqueSessions: new Set() 
+                    };
                 }
-                usersMap[key].count++;
+                
+                // 'Session 1' ~ 'Session 5' 패턴만 추출하여 Set에 추가 (Live, Catch-up 중복 제거)
+                const sessionMatch = (a.session || '').match(/Session\s*[1-5]/i);
+                if (sessionMatch) {
+                    usersMap[key].uniqueSessions.add(sessionMatch[0].toLowerCase());
+                }
             });
 
             const users = Object.values(usersMap);
             
             container.innerHTML = users.map(u => {
-                if (u.count >= 4) {
+                const uniqueCount = u.uniqueSessions.size;
+                
+                if (uniqueCount >= 4) {
                     const safeName = u.name.replace(/'/g, "\\'");
                     const safeSchool = u.school.replace(/'/g, "\\'");
                     return `
@@ -1684,7 +1695,7 @@ function doGet(e) {
                                     <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Eligible: ${u.name}
                                 </h4>
                                 <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-                                    Total Attendance: <strong>${u.count}</strong><br>
+                                    Unique Sessions Attended: <strong>${uniqueCount}</strong> / 5<br>
                                     You are officially eligible for the Certificate of Completion.
                                 </p>
                             </div>
@@ -1700,7 +1711,7 @@ function doGet(e) {
                                 <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible: ${u.name}
                             </h4>
                             <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
-                                You currently have <strong>${u.count}</strong> attendance record(s). You need at least <strong>4 records</strong> to generate the certificate.
+                                You currently have attended <strong>${uniqueCount}</strong> unique session(s). You need at least <strong>4 unique sessions</strong> (between Session 1~5) to generate the certificate.
                             </p>
                         </div>
                     `;
