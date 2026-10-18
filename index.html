@@ -1635,8 +1635,8 @@ function doGet(e) {
             }
         }
 
-        // ============================================
-        // 수료증(Certificate) 로직
+// ============================================
+        // 수료증(Certificate) 로직 (초강력 검색 적용)
         // ============================================
         async function handleCertCheck(e) {
             e.preventDefault();
@@ -1644,7 +1644,6 @@ function doGet(e) {
             const searchCountry = document.getElementById('certCountry').value;
             const searchSchool = document.getElementById('certSchool').value.trim().toLowerCase();
 
-            // 띄어쓰기 및 특수문자를 제거하여 비교 (이름/학교 일부만 입력해도 포함 여부 검색)
             const normalizeStr = str => str.toLowerCase().replace(/[^a-z0-9가-힣]/gi, '');
             const normSearchName = normalizeStr(searchName);
             const normSearchSchool = normalizeStr(searchSchool);
@@ -1652,17 +1651,25 @@ function doGet(e) {
             const container = document.getElementById('certResultContainer');
             container.classList.remove('hidden');
 
-            // 1_2 attendance_teacher 시트의 데이터가 로드되었는지 확인
             if (!appData.officialCert || appData.officialCert.length === 0) {
                 container.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-5 rounded-2xl"><p class="text-amber-800 text-sm font-bold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Official data is still loading or not available. Please refresh and try again.</p></div>`;
                 return;
             }
 
-            // '1_2 attendance_teacher' 시트 데이터에서 검색 (includes로 일부 덩어리만 맞아도 통과)
+            // 구글 시트 헤더 이름이 달라도 유연하게 찾아내는 로직
             const match = appData.officialCert.find(c => {
-                const cName = normalizeStr(c.name || c.fullname || '');
-                const cSchool = normalizeStr(c.school || c.organization || '');
-                const cCountry = (c.country || '').trim().toLowerCase();
+                let cName = "";
+                let cSchool = "";
+                let cCountry = "";
+
+                for (const key in c) {
+                    if (key.includes('name')) cName += c[key] + " ";
+                    if (key.includes('school') || key.includes('org') || key.includes('institute')) cSchool += c[key] + " ";
+                    if (key.includes('country')) cCountry = String(c[key]).trim().toLowerCase();
+                }
+
+                cName = normalizeStr(cName);
+                cSchool = normalizeStr(cSchool);
                 const inputCountry = searchCountry.trim().toLowerCase();
 
                 return cName.includes(normSearchName) && cCountry === inputCountry && cSchool.includes(normSearchSchool);
@@ -1682,15 +1689,26 @@ function doGet(e) {
                 return;
             }
 
-            // 시트 헤더 이름이 'Total Session', 'Total' 등일 경우 공백 제거된 totalsession, total 등으로 들어옵니다.
-            const total = parseInt(match.totalsession || match.total || match.sessions || match.attendance || match.count || 0, 10);
+            // 총 출석 횟수 추출
+            let total = 0;
+            for (const key in match) {
+                if (key.includes('total') || key.includes('session') || key.includes('attend') || key.includes('count')) {
+                    const val = parseInt(match[key], 10);
+                    if (!isNaN(val) && val > total) total = val;
+                }
+            }
             
-            // 화면 및 PDF에 표시될 원본 데이터 (시트에 등록된 공식 이름/학교 우선 반영)
-            const displaySafeName = (match.name || searchName).replace(/'/g, "\\'");
-            const displaySafeSchool = (match.school || searchSchool).replace(/'/g, "\\'");
+            // 수료증 렌더링에 사용될 깔끔한 이름/학교 추출
+            let displaySafeName = searchName;
+            let displaySafeSchool = searchSchool;
+            for (const key in match) {
+                if (key.includes('name') && match[key]) { displaySafeName = String(match[key]).replace(/'/g, "\\'"); break; }
+            }
+            for (const key in match) {
+                if ((key.includes('school') || key.includes('org')) && match[key]) { displaySafeSchool = String(match[key]).replace(/'/g, "\\'"); break; }
+            }
 
             if (total >= 4) {
-                // 4회 이상: 수료 성공 및 다운로드 가능
                 container.innerHTML = `
                     <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-3">
                         <div>
@@ -1708,7 +1726,6 @@ function doGet(e) {
                     </div>
                 `;
             } else {
-                // 4회 미만: 수료 실패 위로 메시지
                 container.innerHTML = `
                     <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl mb-3">
                         <h4 class="text-rose-900 font-bold text-base flex items-center gap-2">
