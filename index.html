@@ -1632,15 +1632,20 @@ function doGet(e) {
         // ============================================
         async function handleCertCheck(e) {
             e.preventDefault();
-            const name = document.getElementById('certName').value.trim().toLowerCase();
-            const country = document.getElementById('certCountry').value;
-            const school = document.getElementById('certSchool').value.trim().toLowerCase();
-            
-            const matchingAtt = appData.attendance.filter(a => 
-                (a.name || '').toLowerCase().includes(name) && 
-                a.country === country && 
-                (a.school || '').toLowerCase().includes(school)
-            );
+            const searchName = document.getElementById('certName').value.trim().toLowerCase();
+            const searchCountry = document.getElementById('certCountry').value;
+            const searchSchool = document.getElementById('certSchool').value.trim().toLowerCase();
+
+            // 띄어쓰기 및 특수문자를 제거하여 비교의 정확도를 높이는 함수 (오타 방지용)
+            const normalizeStr = str => str.toLowerCase().replace(/[^a-z0-9가-힣]/gi, '');
+            const normSearchName = normalizeStr(searchName);
+            const normSearchSchool = normalizeStr(searchSchool);
+
+            const matchingAtt = appData.attendance.filter(a => {
+                const aName = normalizeStr(a.name || '');
+                const aSchool = normalizeStr(a.school || '');
+                return aName.includes(normSearchName) && a.country === searchCountry && aSchool.includes(normSearchSchool);
+            });
             
             const container = document.getElementById('certResultContainer');
             container.classList.remove('hidden');
@@ -1661,20 +1666,38 @@ function doGet(e) {
 
             const usersMap = {};
             matchingAtt.forEach(a => {
-                const normName = (a.name || '').trim().toLowerCase();
-                const normSchool = (a.school || '').trim().toLowerCase();
-                const key = `${normName}|${a.country}|${normSchool}`;
+                // 특수문자와 공백을 제거한 키로 그룹화하여 사소한 오타나 띄어쓰기 차이로 인해 카운트가 분리되는 것을 방지합니다.
+                const aName = normalizeStr(a.name || '');
+                const aSchool = normalizeStr(a.school || '');
+                const key = `${aName}|${a.country}|${aSchool}`;
                 
                 if (!usersMap[key]) {
-                    usersMap[key] = { name: (a.name || '').trim(), school: (a.school || '').trim(), count: 0 };
+                    usersMap[key] = { 
+                        name: (a.name || '').trim(), // 화면과 수료증에 출력될 최초 입력 이름
+                        school: (a.school || '').trim(), 
+                        sessions: new Set() // 동일 세션 중복 제출을 방지하는 Set
+                    };
                 }
-                usersMap[key].count++;
+
+                // Session 중복 집계 방지: Session 1~5 및 Townhall 텍스트만 추출해서 저장
+                let sessionRaw = (a.session || '').toLowerCase();
+                let sessionKey = sessionRaw;
+                if (sessionRaw.includes('session 1')) sessionKey = 'session 1';
+                else if (sessionRaw.includes('session 2')) sessionKey = 'session 2';
+                else if (sessionRaw.includes('session 3')) sessionKey = 'session 3';
+                else if (sessionRaw.includes('session 4')) sessionKey = 'session 4';
+                else if (sessionRaw.includes('session 5')) sessionKey = 'session 5';
+                else if (sessionRaw.includes('townhall')) sessionKey = 'townhall';
+
+                usersMap[key].sessions.add(sessionKey);
             });
 
             const users = Object.values(usersMap);
             
             container.innerHTML = users.map(u => {
-                if (u.count >= 4) {
+                const uniqueCount = u.sessions.size; // 고유 세션 출석 횟수
+
+                if (uniqueCount >= 4) {
                     const safeName = u.name.replace(/'/g, "\\'");
                     const safeSchool = u.school.replace(/'/g, "\\'");
                     return `
@@ -1684,7 +1707,7 @@ function doGet(e) {
                                     <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i> Eligible: ${u.name}
                                 </h4>
                                 <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-                                    Total Attendance: <strong>${u.count}</strong><br>
+                                    Unique Sessions Attended: <strong>${uniqueCount}</strong><br>
                                     You are officially eligible for the Certificate of Completion.
                                 </p>
                             </div>
@@ -1700,7 +1723,7 @@ function doGet(e) {
                                 <i class="fa-solid fa-circle-xmark text-rose-600 text-xl"></i> Not Eligible: ${u.name}
                             </h4>
                             <p class="text-xs text-rose-700 mt-1.5 leading-relaxed">
-                                You currently have <strong>${u.count}</strong> attendance record(s). You need at least <strong>4 records</strong> to generate the certificate.
+                                You currently have <strong>${uniqueCount}</strong> unique attendance record(s). You need at least <strong>4 distinct sessions</strong> to generate the certificate.
                             </p>
                         </div>
                     `;
